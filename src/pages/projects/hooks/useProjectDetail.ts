@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import type { Project } from '../../../types';
-import { mockProjects } from '../../../data';
+import type { Project, Achievement } from '../../../types';
+import { mockProjects, mockAchievements } from '../../../data';
 
 export const useProjectDetail = (id: string | undefined) => {
   const [project, setProject] = useState<Project | null>(null);
+  const [relatedAchievements, setRelatedAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -11,11 +12,13 @@ export const useProjectDetail = (id: string | undefined) => {
 
     const fetchDetail = async () => {
       setLoading(true);
-      // จำลองการโหลด 0.5 วินาที
-      // (ตอนต่อ API จริง จะเป็น axios.get(`/projects/${id}`))
       setTimeout(() => {
         const foundProject = mockProjects.find((p) => p.id === id);
+        // 🔎 กรองหาเฉพาะรางวัลที่มี projectID ตรงกับหน้านี้
+        const awards = mockAchievements.filter((a) => a.projectID === id);
+        
         setProject(foundProject || null);
+        setRelatedAchievements(awards);
         setLoading(false);
       }, 500);
     };
@@ -23,5 +26,5 @@ export const useProjectDetail = (id: string | undefined) => {
     fetchDetail();
   }, [id]);
 
-  return { project, loading };
+  return { project, relatedAchievements, loading };
 };

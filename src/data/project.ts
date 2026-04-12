@@ -156,8 +156,25 @@ export const mockAchievements: Achievement[] = [
   {
     id: "achv-01",
     userID: USER_ID,
+    projectID: "",
     title: "Completed API Observability Setup Masterclass",
     category: "training",
     dateAchieved: "2026-03-15T00:00:00Z",
   },
+  {
+    id: "achv-02",
+    userID: USER_ID,
+    projectID: "proj-02",
+    title: "Won 2nd Place in University Hackathon",
+    category: "award",
+    dateAchieved: "2025-11-20T00:00:00Z",
+  },
+  {
+    id: "achv-03",
+    userID: USER_ID,
+    projectID: "proj-01",
+    title: "Received Best Research Project Award",
+    category: "award",
+    dateAchieved: "2026-02-20T00:00:00Z",
+  }
 ];

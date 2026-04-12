@@ -2,9 +2,11 @@ import { useAbout } from './hooks/useAbout';
 import ProfileSection from './components/ProfileSection';
 import ExperienceTimeline from './components/ExperienceTimeline';
 import EducationGrid from './components/EducationGrid';
+import AchievementList from './components/AchievementList';
 
 const AboutPage = () => {
-  const { user, loading } = useAbout();
+  // 2. อย่าลืมดึง achievements ออกมาจาก useAbout() ด้วย
+  const { user, achievements, loading } = useAbout();
 
   if (loading || !user) {
     return (
@@ -19,6 +21,7 @@ const AboutPage = () => {
       <ProfileSection user={user} />
       <ExperienceTimeline experiences={user.experiences || []} />
       <EducationGrid studies={user.studies || []} />
+      <AchievementList achievements={achievements} />
     </div>
   );
 };
