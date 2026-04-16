@@ -1,3 +1,4 @@
+import { useState } from "react"; // 🌟 เพิ่ม useState
 import { Link } from "react-router-dom";
 import { useProjectForm } from "./hooks/useProjectForm";
 
@@ -5,16 +6,28 @@ const AdminProjectForm = () => {
   const { 
     isEditMode, formData, previewCover, isLoading, isFetching, 
     existingGallery, newGallery, 
+    availableTechs, selectedTechIds, 
     handleChange, handleCoverChange, removeCover, 
     handleAddGalleryImages, handleGalleryCaptionChange, 
     handleExistingGalleryCaptionChange,
     removeNewGalleryImage, removeExistingGalleryImage,
+    addTech, removeTech, // 🌟 ดึงฟังก์ชัน Add/Remove มาใช้
     handleSubmit 
   } = useProjectForm();
+
+  // 🌟 State สำหรับระบบค้นหาใน Dropdown
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   if (isFetching) {
     return <div className="p-8 text-center text-slate-500 font-medium">กำลังดึงข้อมูล...</div>;
   }
+
+  // 🌟 ตัวกรอง Tech ที่ยังไม่ได้เลือก และตรงกับคำค้นหา
+  const unselectedTechs = availableTechs.filter(tech => !selectedTechIds.includes(tech.id));
+  const filteredTechs = unselectedTechs.filter(tech => 
+    tech.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="max-w-4xl mx-auto pb-12">
@@ -46,7 +59,96 @@ const AdminProjectForm = () => {
 
         <hr className="border-slate-100" />
 
-        {/* 1. โซนรูปหน้าปก (Cover Image) */}
+        {/* 🌟 1. โซนเลือก Tech Stack แบบ ค้นหาและลบออกได้ */}
+        <div>
+          <div className="mb-4">
+            <h3 className="text-lg font-bold text-slate-800">Technologies Used (เทคโนโลยีที่ใช้)</h3>
+            <p className="text-sm text-slate-500">ค้นหาและเลือกเทคโนโลยีที่ใช้ในโปรเจกต์นี้</p>
+          </div>
+
+          <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200">
+            
+            {/* โชว์ Tag ที่ถูกเลือก (กดกากบาทลบได้) */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              {selectedTechIds.map((techId) => {
+                const tech = availableTechs.find((t) => t.id === techId);
+                if (!tech) return null;
+                return (
+                  <span key={tech.id} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 text-blue-700 text-sm font-bold rounded-lg border border-blue-200 shadow-sm animate-fade-in">
+                    {tech.iconURL && !tech.iconURL.includes("placehold") && (
+                      <img src={tech.iconURL} alt={tech.name} className="w-4 h-4 object-contain" />
+                    )}
+                    {tech.name}
+                    <button
+                      type="button"
+                      onClick={() => removeTech(tech.id)}
+                      className="ml-1 p-0.5 text-blue-400 hover:text-red-500 hover:bg-white rounded-md transition-colors"
+                      title="ลบออก"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                    </button>
+                  </span>
+                );
+              })}
+              {selectedTechIds.length === 0 && (
+                <span className="text-sm text-slate-400 py-1.5">ยังไม่ได้เลือกเทคโนโลยี</span>
+              )}
+            </div>
+
+            {/* ช่องค้นหา + Dropdown */}
+            <div className="relative">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setIsDropdownOpen(true);
+                }}
+                onFocus={() => setIsDropdownOpen(true)}
+                onBlur={() => setIsDropdownOpen(false)}
+                placeholder="🔍 พิมพ์ค้นหาเทคโนโลยีเพื่อเพิ่ม..."
+                className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-white transition-colors"
+              />
+              
+              {/* รายการ Dropdown ที่โชว์เมื่อกำลังพิมพ์ หรือ Focus ช่องค้นหา */}
+              {isDropdownOpen && filteredTechs.length > 0 && (
+                <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl max-h-56 overflow-y-auto">
+                  {filteredTechs.map((tech) => (
+                    <div
+                      key={tech.id}
+                      // ใช้ onMouseDown เพื่อให้มันทำงานก่อนที่ Input จะเสีย Focus
+                      onMouseDown={(e) => {
+                        e.preventDefault(); 
+                        addTech(tech.id);
+                        setSearchTerm(""); // เคลียร์ช่องค้นหา
+                        setIsDropdownOpen(false); // ปิด Dropdown
+                      }}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-0 transition-colors"
+                    >
+                      {tech.iconURL && !tech.iconURL.includes("placehold") ? (
+                        <img src={tech.iconURL} alt={tech.name} className="w-5 h-5 object-contain" />
+                      ) : (
+                        <div className="w-5 h-5 bg-slate-200 rounded-md"></div>
+                      )}
+                      <span className="font-medium text-slate-700">{tech.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* กรณีพิมพ์หาแล้วไม่เจอ */}
+              {isDropdownOpen && searchTerm !== "" && filteredTechs.length === 0 && (
+                 <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl p-4 text-center text-slate-500 text-sm">
+                    ไม่พบเทคโนโลยีที่คุณค้นหา
+                 </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <hr className="border-slate-100" />
+
+        {/* 2. โซนรูปหน้าปก (Cover Image) */}
         <div>
           <h3 className="text-lg font-bold text-slate-800 mb-4">1. Cover Image (รูปภาพหน้าปก)</h3>
           {previewCover ? (
@@ -65,7 +167,7 @@ const AdminProjectForm = () => {
           )}
         </div>
 
-        {/* 2. โซนแกลลอรีรูปภาพ (Project Images) */}
+        {/* 3. โซนแกลลอรีรูปภาพ (Project Images) */}
         <div>
           <div className="flex justify-between items-end mb-4">
             <div>
@@ -79,14 +181,12 @@ const AdminProjectForm = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            
             {/* รูปเก่า */}
             {existingGallery.map((img) => (
               <div key={img.id} className="bg-slate-50 p-2 rounded-xl border border-slate-200 flex flex-col gap-2 relative group transition-all">
                 <div className="w-full h-32 rounded-lg overflow-hidden bg-slate-200 border border-slate-200">
                   <img src={img.imageURL} alt="Existing" className="w-full h-full object-cover" />
                 </div>
-                {/* 🌟 พระเอกอยู่ตรงนี้: ยืดตอนแก้ ยุบตอนปล่อย */}
                 <textarea 
                   value={img.caption || ""} 
                   onChange={(e) => handleExistingGalleryCaptionChange(img.id, e.target.value)}
@@ -106,7 +206,6 @@ const AdminProjectForm = () => {
                 <div className="w-full h-32 rounded-lg overflow-hidden bg-slate-200 border border-blue-100">
                   <img src={item.preview} alt={`New ${index}`} className="w-full h-full object-cover" />
                 </div>
-                {/* 🌟 ยืดตอนแก้ ยุบตอนปล่อย (สำหรับรูปใหม่) */}
                 <textarea 
                   value={item.caption} 
                   onChange={(e) => handleGalleryCaptionChange(index, e.target.value)}

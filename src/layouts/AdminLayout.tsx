@@ -18,6 +18,7 @@ const AdminLayout = () => {
     { path: "/admin/profile", label: "My Profile", icon: "👤" },
     { path: "/admin/projects", label: "Manage Projects", icon: "📁" },
     { path: "/admin/achievements", label: "Achievements", icon: "🏆" },
+    { path: "/admin/tech", label: "Technologies", icon: "💻" }
   ];
 
   return (

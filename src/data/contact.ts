@@ -1,6 +1,6 @@
 import type { Contact } from '../types';
 
-export const USER_ID = "4ed6694f-bca5-4707-9af5-1d3b915452bb"; // ใช้เป็นค่าคงที่ไว้แชร์กับไฟล์อื่น
+export const USER_ID = "4ed6694f-bca5-4707-9af5-1d3b915452bb";
 
 export const mockContacts: Contact[] = [
   {
