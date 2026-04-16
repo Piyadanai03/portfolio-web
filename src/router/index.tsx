@@ -11,6 +11,7 @@ import AdminProjectList from '../pages/admin/projects';
 import AdminProjectForm from '../pages/admin/projects/form';
 import AdminAchievements from '../pages/admin/achievements';
 import AdminProfile from '../pages/admin/profile';
+import AdminTech from '../pages/admin/tech';
 
 const router = createBrowserRouter([
   {
@@ -66,7 +67,11 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <AdminProfile />,
-      }
+      },
+      {
+        path: "tech",
+        element: <AdminTech />,
+      },
 
 
     ],
