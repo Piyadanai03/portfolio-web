@@ -16,14 +16,14 @@ const FeaturedProjects = ({ projects }: Props) => {
     <section className="py-16 md:py-24">
       <div className="flex flex-col md:flex-row justify-between items-end mb-12">
         <div>
-          <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Featured Work</h2>
-          <p className="text-lg text-slate-500">ผลงานที่ผมคัดสรรมาแล้วว่า "ดีที่สุด"</p>
+          <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Examples of work</h2>
+          <p className="text-lg text-slate-500">ตัวอย่างผลงานที่เคยทำ</p>
         </div>
         <Link 
           to="/projects" 
           className="group flex items-center gap-2 text-blue-600 font-bold hover:text-blue-700 transition-colors mt-4 md:mt-0"
         >
-          Explore All Projects
+          All Projects
           <span className="group-hover:translate-x-1 transition-transform">→</span>
         </Link>
       </div>
@@ -39,7 +39,7 @@ const FeaturedProjects = ({ projects }: Props) => {
           {/* รูปภาพ Background */}
           <div className="absolute inset-0">
             <img 
-              src={heroProject.coverImageURL || 'https://placehold.co/1200x800'} 
+              src={heroProject.coverImageURL} 
               alt={heroProject.title} 
               className="w-full h-full object-cover opacity-60 group-hover:opacity-40 group-hover:scale-105 transition-all duration-700"
             />
@@ -78,7 +78,7 @@ const FeaturedProjects = ({ projects }: Props) => {
               {/* รูปภาพส่วนบนครึ่งนึง */}
               <div className="absolute inset-0 h-3/5 overflow-hidden">
                 <img 
-                  src={project.coverImageURL || 'https://placehold.co/600x400'} 
+                  src={project.coverImageURL} 
                   alt={project.title} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
