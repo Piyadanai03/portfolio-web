@@ -1,12 +1,13 @@
 import { useProfile } from "./hooks/useProfile";
 import { GeneralInfo } from "./components/GeneralInfo";
 import { ContactLinks } from "./components/ContactLinks";
+import { ProfileMedia } from "./components/ProfileMedia"; // 🌟 Import Component ใหม่
 
 export const AdminProfile = () => {
   const {
-    profile,
+    profile, setProfile, // รับ setProfile มาใช้กับ ProfileMedia
     positionTags, setPositionTags,
-    contacts, setContacts, // 🌟 แก้ 1: เปลี่ยนจาก socialLinks เป็น contacts ให้ตรงกับ Hook
+    contacts, setContacts,
     isFetching, isLoading, handleChange, saveProfile,
   } = useProfile();
 
@@ -28,7 +29,13 @@ export const AdminProfile = () => {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         
-        {/* 🌟 โยน Props เข้า Component ข้อมูลทั่วไป */}
+        {/* 🌟 1. ข้อมูลรูปโปรไฟล์และ Resume */}
+        <ProfileMedia 
+          profile={profile} 
+          setProfile={setProfile} 
+        />
+
+        {/* 2. ข้อมูลทั่วไปและที่อยู่ */}
         <GeneralInfo 
           profile={profile} 
           handleChange={handleChange} 
@@ -36,13 +43,12 @@ export const AdminProfile = () => {
           setPositionTags={setPositionTags} 
         />
 
-        {/* 🌟 แก้ 2: โยน Props เข้า Component ข้อมูลการติดต่อ (ลบ profile กับ handleChange ออกไป) */}
+        {/* 3. ช่องทางการติดต่อ */}
         <ContactLinks 
           contacts={contacts} 
           setContacts={setContacts} 
         />
 
-        {/* Floating Save Button */}
         <div className="flex justify-end pt-4">
           <button
             type="submit"

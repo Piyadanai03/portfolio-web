@@ -6,12 +6,15 @@ import type { Contact } from '../../../../types';
 export interface ProfileData {
   fullName: string;
   position: string;
-  bio: string;
+  bioText: string;
+  address: string;          // 🌟 เพิ่ม Address
+  profileImageURL: string;  // 🌟 เพิ่ม Profile Image
+  resumeURL: string;        // 🌟 เพิ่ม Resume
 }
 
 export const useProfile = () => {
   const [profile, setProfile] = useState<ProfileData>({
-    fullName: '', position: '', bio: ''
+    fullName: '', position: '', bioText: '', address: '', profileImageURL: '', resumeURL: ''
   });
   
   const [positionTags, setPositionTags] = useState<string[]>([]);
@@ -23,12 +26,15 @@ export const useProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await authApi.get('/user/profile');
+        const response = await authApi.get('/member/profile'); 
         if (response.data) {
           setProfile({
             fullName: response.data.fullName || '',
             position: response.data.position || '',
-            bio: response.data.bio || ''
+            bioText: response.data.bioText || '',
+            address: response.data.address || '',
+            profileImageURL: response.data.profileImageURL || '',
+            resumeURL: response.data.resumeURL || ''
           });
           
           if (response.data.position) {
@@ -67,11 +73,11 @@ export const useProfile = () => {
       const finalData = {
         ...profile,
         position: positionTags.join(' | '),
-        contacts: contacts
+        contacts: contacts 
       };
       
       console.log("Saving Profile Data: ", finalData);
-      await authApi.put('/user/profile', finalData);
+      await authApi.put('/member/profile', finalData);
       alert('อัปเดตโปรไฟล์สำเร็จ!');
     } catch (error) {
       console.error(error);
@@ -82,7 +88,7 @@ export const useProfile = () => {
   };
 
   return { 
-    profile, 
+    profile, setProfile, // ส่ง setProfile ออกไปด้วยเพื่อให้ ProfileMedia อัปเดตไฟล์ได้
     positionTags, setPositionTags, 
     contacts, setContacts, 
     isFetching, isLoading, handleChange, saveProfile 

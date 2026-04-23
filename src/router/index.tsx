@@ -7,11 +7,12 @@ import ProjectDetailPage from "../pages/projects/detail";
 import LoginPage from "../pages/login";
 import AdminLayout from "../layouts/AdminLayout";
 import AdminDashboard from "../pages/admin/dashboard";
-import AdminProjectList from '../pages/admin/projects';
-import AdminProjectForm from '../pages/admin/projects/form';
-import AdminAchievements from '../pages/admin/achievements';
-import AdminProfile from '../pages/admin/profile';
-import AdminTech from '../pages/admin/tech';
+import AdminProjectList from "../pages/admin/projects";
+import AdminProjectForm from "../pages/admin/projects/form";
+import AdminAchievements from "../pages/admin/achievements";
+import AdminProfile from "../pages/admin/profile";
+import AdminTech from "../pages/admin/tech";
+import { ProtectedRoute } from "../components/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -42,38 +43,20 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    element: <AdminLayout />,
+    element: <ProtectedRoute />,
     children: [
       {
-        index: true,
-        element: <AdminDashboard />,
+        element: <AdminLayout />,
+        children: [
+          { index: true, element: <AdminDashboard /> },
+          { path: "projects", element: <AdminProjectList /> },
+          { path: "projects/new", element: <AdminProjectForm /> },
+          { path: "projects/edit/:id", element: <AdminProjectForm /> },
+          { path: "achievements", element: <AdminAchievements /> },
+          { path: "profile", element: <AdminProfile /> },
+          { path: "tech", element: <AdminTech /> },
+        ],
       },
-      {
-        path: "projects",
-        element: <AdminProjectList />,
-      },
-      {
-        path: "projects/new",
-        element: <AdminProjectForm />,
-      },
-      {
-        path: "projects/edit/:id",
-        element: <AdminProjectForm />,
-      },
-      {
-        path: "achievements",
-        element: <AdminAchievements />,
-      },
-      {
-        path: "profile",
-        element: <AdminProfile />,
-      },
-      {
-        path: "tech",
-        element: <AdminTech />,
-      },
-
-
     ],
   },
 ]);

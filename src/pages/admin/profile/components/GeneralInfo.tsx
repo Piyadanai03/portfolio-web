@@ -1,8 +1,8 @@
 import type { ChangeEvent } from 'react';
-import { TagInput } from './TagInput'; // ให้แน่ใจว่า import TagInput มาถูกต้องตาม path ของคุณ
+import { TagInput } from './TagInput';
 
 interface GeneralInfoProps {
-  profile: { fullName: string; bio: string };
+  profile: { fullName: string; bioText: string; address: string };
   handleChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   positionTags: string[];
   setPositionTags: (tags: string[]) => void;
@@ -39,12 +39,25 @@ export const GeneralInfo = ({ profile, handleChange, positionTags, setPositionTa
         <div className="md:col-span-2">
           <label className="block text-sm font-bold text-slate-700 mb-2">Bio / About Me</label>
           <textarea
-            name="bio"
-            value={profile.bio}
+            name="bioText"
+            value={profile.bioText}
             onChange={handleChange}
             rows={4}
             className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all resize-y"
             placeholder="เขียนแนะนำตัวสั้นๆ..."
+          />
+        </div>
+
+        {/* 🌟 เพิ่มช่อง Address */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-bold text-slate-700 mb-2">Address / Location</label>
+          <textarea
+            name="address"
+            value={profile.address}
+            onChange={handleChange}
+            rows={2}
+            className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all resize-y"
+            placeholder="ที่อยู่, เมือง, ประเทศ..."
           />
         </div>
       </div>

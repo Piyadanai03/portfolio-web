@@ -6,7 +6,6 @@ interface ContactLinksProps {
   setContacts: (contacts: Contact[]) => void;
 }
 
-// เพิ่มตัวเลือกให้ครอบคลุมมากขึ้น
 const PLATFORM_OPTIONS = [
   { name: 'GitHub', defaultIconURL: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg' },
   { name: 'LinkedIn', defaultIconURL: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linkedin/linkedin-original.svg' },
@@ -24,13 +23,12 @@ const PLATFORM_OPTIONS = [
 
 export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
   
-  // 🌟 4. Auto-Empty State: ถ้าไม่มีข้อมูลเลย ให้สร้างช่องว่างรอไว้ 1 ช่องทันที
   useEffect(() => {
     if (contacts.length === 0) {
       setContacts([{ 
-        id: `new-${Date.now()}`,
+        id: crypto.randomUUID(), // 🌟 ใช้ UUID ของจริง
         userID: "", 
-        platformName: "", // ว่างไว้รอให้เลือก
+        platformName: "",
         urlValue: "", 
         iconURL: "", 
         isActive: true 
@@ -38,14 +36,13 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
     }
   }, [contacts.length, setContacts]);
 
-  // 🌟 3. กดเพิ่ม ให้ขึ้นช่องว่างๆ
   const addContact = () => {
     setContacts([
       ...contacts, 
       { 
-        id: `new-${Date.now()}`,
+        id: crypto.randomUUID(), // 🌟 ใช้ UUID ของจริง
         userID: "", 
-        platformName: "", // เริ่มด้วยช่องว่าง
+        platformName: "", 
         urlValue: "", 
         iconURL: "", 
         isActive: true 
@@ -57,19 +54,17 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
     const updated = [...contacts];
     updated[index] = { ...updated[index], [field]: value };
 
-    // ดึงไอคอนตั้งต้นอัตโนมัติเมื่อเลือกแพลตฟอร์มจาก Dropdown
     if (field === 'platformName') {
       const selectedPlatform = PLATFORM_OPTIONS.find(p => p.name === value);
       if (selectedPlatform) {
         updated[index].iconURL = selectedPlatform.defaultIconURL;
       } else if (value === "Other") {
-        updated[index].iconURL = ""; // เคลียร์รูปถ้าเลือกอื่นๆ
+        updated[index].iconURL = ""; 
       }
     }
     setContacts(updated);
   };
 
-  // 🌟 2. ฟังก์ชันเลื่อนตำแหน่งลำดับ (ขึ้น/ลง)
   const moveContact = (index: number, direction: 'up' | 'down') => {
     const updated = [...contacts];
     if (direction === 'up' && index > 0) {
@@ -118,8 +113,6 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
 
       <div className="space-y-6">
         {contacts.map((contact, index) => {
-          
-          // ตรวจสอบว่า Platform ที่เก็บใน DB เป็นแบบพิมพ์เองหรือเปล่า
           const isStandardPlatform = PLATFORM_OPTIONS.some(p => p.name === contact.platformName);
           const isCustom = contact.platformName !== "" && !isStandardPlatform;
 
@@ -128,7 +121,6 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
               
               <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                 
-                {/* ปุ่มเปิด/ปิด การมองเห็น */}
                 <label className="flex items-center cursor-pointer shrink-0" title={contact.isActive ? "กำลังแสดงผล" : "ซ่อนอยู่"}>
                   <div className="relative">
                     <input type="checkbox" className="sr-only" checked={contact.isActive} onChange={(e) => updateContact(index, 'isActive', e.target.checked)} />
@@ -137,13 +129,12 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
                   </div>
                 </label>
 
-                {/* 🌟 1. ระบบเลือกแพลตฟอร์มแบบใหม่ (Select + Input กรณีพิมพ์เอง) */}
                 <div className="w-full sm:w-1/3 flex flex-col gap-2">
                   <select 
                     value={contact.platformName === "" ? "" : (isCustom || contact.platformName === "Other" ? "Other" : contact.platformName)}
                     onChange={(e) => {
                       if (e.target.value === "Other") {
-                        updateContact(index, 'platformName', 'Other'); // เปิดโหมดพิมพ์เอง
+                        updateContact(index, 'platformName', 'Other');
                       } else {
                         updateContact(index, 'platformName', e.target.value);
                       }
@@ -155,7 +146,6 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
                     <option value="Other">อื่นๆ (พิมพ์เอง)</option>
                   </select>
 
-                  {/* ถ้าเลือก "อื่นๆ" ให้โชว์ช่องกรอกชื่อ */}
                   {(isCustom || contact.platformName === "Other") && (
                     <input 
                       type="text" 
@@ -168,7 +158,6 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
                   )}
                 </div>
 
-                {/* ช่องกรอก URL หรือ เบอร์โทร */}
                 <div className="w-full sm:flex-1 flex flex-wrap sm:flex-nowrap gap-2">
                   <input 
                     type="text" 
@@ -178,7 +167,6 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
                     className="flex-1 w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 bg-white"
                   />
                   
-                  {/* 🌟 2. ปุ่มจัดการ เลื่อนขึ้น/ลง/ลบ */}
                   <div className="flex gap-1 shrink-0 w-full sm:w-auto justify-end mt-2 sm:mt-0">
                     <button 
                       type="button" 
@@ -210,7 +198,6 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
                 </div>
               </div>
 
-              {/* การจัดการ Icon */}
               <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center pl-0 sm:pl-[3.25rem]">
                 <div className="w-10 h-10 rounded-lg border border-slate-200 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                   {contact.iconURL ? (
