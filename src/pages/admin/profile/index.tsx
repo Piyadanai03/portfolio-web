@@ -1,13 +1,14 @@
 import { useProfile } from "./hooks/useProfile";
 import { GeneralInfo } from "./components/GeneralInfo";
 import { ContactLinks } from "./components/ContactLinks";
-import { ProfileMedia } from "./components/ProfileMedia"; // 🌟 Import Component ใหม่
+import { ProfileMedia } from "./components/ProfileMedia"; 
 
 export const AdminProfile = () => {
   const {
-    profile, setProfile, // รับ setProfile มาใช้กับ ProfileMedia
+    profile, setProfile, 
     positionTags, setPositionTags,
     contacts, setContacts,
+    setProfileFile, setResumeFile, // 🌟 ดึงฟังก์ชันสำหรับเซ็ตไฟล์มาใช้งาน
     isFetching, isLoading, handleChange, saveProfile,
   } = useProfile();
 
@@ -33,6 +34,8 @@ export const AdminProfile = () => {
         <ProfileMedia 
           profile={profile} 
           setProfile={setProfile} 
+          setProfileFile={setProfileFile} // 🌟 ส่งต่อไปให้ Component รับไฟล์
+          setResumeFile={setResumeFile}   // 🌟 ส่งต่อไปให้ Component รับไฟล์
         />
 
         {/* 2. ข้อมูลทั่วไปและที่อยู่ */}

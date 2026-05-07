@@ -4,9 +4,12 @@ import type { ProfileData } from '../hooks/useProfile';
 interface ProfileMediaProps {
   profile: ProfileData;
   setProfile: Dispatch<SetStateAction<ProfileData>>;
+  // 🌟 เพิ่ม Props สำหรับเซ็ตไฟล์จริง
+  setProfileFile: Dispatch<SetStateAction<File | null>>;
+  setResumeFile: Dispatch<SetStateAction<File | null>>;
 }
 
-export const ProfileMedia = ({ profile, setProfile }: ProfileMediaProps) => {
+export const ProfileMedia = ({ profile, setProfile, setProfileFile, setResumeFile }: ProfileMediaProps) => {
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, field: 'profileImageURL' | 'resumeURL') => {
     const file = e.target.files?.[0];
@@ -17,6 +20,14 @@ export const ProfileMedia = ({ profile, setProfile }: ProfileMediaProps) => {
       return; 
     }
 
+    // 🌟 1. เก็บไฟล์ตัวจริงลงใน State เพื่อเตรียมส่งให้ Backend
+    if (field === 'profileImageURL') {
+      setProfileFile(file);
+    } else if (field === 'resumeURL') {
+      setResumeFile(file);
+    }
+
+    // 🌟 2. สร้าง Base64 เพื่อให้หน้าเว็บแสดงผล Preview ได้ทันที
     const reader = new FileReader();
     reader.onloadend = () => {
       setProfile(prev => ({ ...prev, [field]: reader.result as string }));
@@ -74,7 +85,7 @@ export const ProfileMedia = ({ profile, setProfile }: ProfileMediaProps) => {
             />
           </div>
           <div className="flex items-center justify-between">
-             <span className="text-xs text-slate-400 font-bold">หรืออัปโหลดเป็น Base64 (ไม่เกิน 200KB)</span>
+             <span className="text-xs text-slate-400 font-bold">หรืออัปโหลดเป็นไฟล์ (ไม่เกิน 200KB)</span>
              <label className="cursor-pointer bg-purple-100 hover:bg-purple-200 text-purple-700 px-4 py-2 rounded-lg text-xs font-bold transition-colors">
                 📄 อัปโหลดไฟล์ PDF
                 <input type="file" accept="application/pdf, image/*" className="hidden" onChange={(e) => handleFileUpload(e, 'resumeURL')} />

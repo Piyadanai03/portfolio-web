@@ -7,9 +7,9 @@ export interface ProfileData {
   fullName: string;
   position: string;
   bioText: string;
-  address: string;          // 🌟 เพิ่ม Address
-  profileImageURL: string;  // 🌟 เพิ่ม Profile Image
-  resumeURL: string;        // 🌟 เพิ่ม Resume
+  address: string;
+  profileImageURL: string;
+  resumeURL: string;
 }
 
 export const useProfile = () => {
@@ -19,7 +19,8 @@ export const useProfile = () => {
   
   const [positionTags, setPositionTags] = useState<string[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
-  
+  const [profileFile, setProfileFile] = useState<File | null>(null);
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isFetching, setIsFetching] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -70,14 +71,25 @@ export const useProfile = () => {
   const saveProfile = async () => {
     setIsLoading(true);
     try {
-      const finalData = {
-        ...profile,
-        position: positionTags.join(' | '),
-        contacts: contacts 
-      };
+      const formData = new FormData();
+      formData.append('fullName', profile.fullName);
+      formData.append('position', positionTags.join(' | '));
+      formData.append('bioText', profile.bioText);
+      formData.append('address', profile.address);
+      formData.append('contacts', JSON.stringify(contacts));
+      if (profileFile) {
+        formData.append('profileImage', profileFile);
+      }
+      if (resumeFile) {
+        formData.append('resume', resumeFile);
+      }
       
-      console.log("Saving Profile Data: ", finalData);
-      await authApi.put('/member/profile', finalData);
+      console.log("Saving Profile via FormData");
+      await authApi.put('/member/profile', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       alert('อัปเดตโปรไฟล์สำเร็จ!');
     } catch (error) {
       console.error(error);
@@ -88,9 +100,10 @@ export const useProfile = () => {
   };
 
   return { 
-    profile, setProfile, // ส่ง setProfile ออกไปด้วยเพื่อให้ ProfileMedia อัปเดตไฟล์ได้
+    profile, setProfile, 
     positionTags, setPositionTags, 
     contacts, setContacts, 
+    setProfileFile, setResumeFile,
     isFetching, isLoading, handleChange, saveProfile 
   };
 };
