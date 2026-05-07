@@ -23,7 +23,6 @@ export const TechForm = ({ initialData, onSave, onCancel }: TechFormProps) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  // ดักการอัปโหลดไฟล์ Base64 (เหมือนหน้า Profile)
   const handleIconUpload = (file: File | undefined) => {
     if (!file) return;
     if (file.size > 100 * 1024) {
@@ -43,57 +42,65 @@ export const TechForm = ({ initialData, onSave, onCancel }: TechFormProps) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8 animate-fade-in">
-      <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-        {initialData ? '✏️ Edit Technology' : '✨ Add New Technology'}
-      </h3>
+    // 🌟 ปรับสไตล์ให้เป็น Pop-up สวยๆ
+    <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+          {initialData ? '✏️ Edit Technology' : '✨ Add New Technology'}
+        </h3>
+        {/* 🌟 เพิ่มปุ่ม X ปิด Pop-up มุมขวาบน */}
+        <button type="button" onClick={onCancel} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-1">Name (ชื่อเทคโนโลยี) *</label>
-            <input type="text" name="name" required value={formData.name || ''} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white" placeholder="เช่น React, Go, Docker" />
+            <input type="text" name="name" required value={formData.name || ''} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all" placeholder="เช่น React, Go, Docker" />
           </div>
 
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-1">Category (หมวดหมู่) *</label>
-            <select name="category" value={formData.category || 'Frontend'} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white">
+            <select name="category" value={formData.category || 'Frontend'} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all font-medium">
               {CATEGORY_OPTIONS.map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </select>
           </div>
 
-          <div className="sm:col-span-2">
-             <label className="block text-sm font-bold text-slate-700 mb-2">Icon (ไอคอน)</label>
+          <div className="sm:col-span-2 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+             <label className="block text-sm font-bold text-slate-700 mb-3">Icon (ไอคอน)</label>
              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                 
-                {/* พรีวิวรูปภาพ */}
-                <div className="w-12 h-12 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0">
+                <div className="w-14 h-14 rounded-xl border border-slate-200 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                    {formData.iconURL ? (
-                     <img src={formData.iconURL} alt="Preview" className="w-8 h-8 object-contain" />
+                     <img src={formData.iconURL} alt="Preview" className="w-10 h-10 object-contain" />
                    ) : (
-                     <span className="text-[10px] font-bold text-slate-400">NO IMG</span>
+                     <span className="text-[10px] font-black text-slate-400">NO IMG</span>
                    )}
                 </div>
 
                 <div className="w-full flex-1">
-                  <input type="url" name="iconURL" value={formData.iconURL || ''} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white" placeholder="วางลิงก์รูปภาพ (URL)" />
+                  <input type="url" name="iconURL" value={formData.iconURL || ''} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-white" placeholder="วางลิงก์รูปภาพ (URL)" />
                 </div>
                 
                 <span className="text-xs text-slate-400 font-bold hidden sm:block">หรือ</span>
 
-                <label className="cursor-pointer bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors w-full sm:w-auto text-center shrink-0">
+                <label className="cursor-pointer bg-blue-100 hover:bg-blue-200 text-blue-700 px-5 py-2.5 rounded-xl text-sm font-bold transition-colors w-full sm:w-auto text-center shrink-0">
                   📁 อัปโหลดไฟล์
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => handleIconUpload(e.target.files?.[0])} />
                 </label>
              </div>
-             <p className="text-xs text-slate-500 mt-2">คำแนะนำ: ค้นหาไอคอนฟรีได้ที่ <a href="https://devicon.dev/" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">Devicon</a> (ก๊อปปี้ลิงก์ svg มาวางได้เลย)</p>
+             <p className="text-xs text-slate-500 mt-3 font-medium">คำแนะนำ: ค้นหาไอคอนฟรีได้ที่ <a href="https://devicon.dev/" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">Devicon</a></p>
           </div>
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-          <button type="button" onClick={onCancel} className="px-6 py-2.5 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
-          <button type="submit" className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition-all">Save Technology</button>
+          <button type="button" onClick={onCancel} className="px-6 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors">Cancel</button>
+          <button type="submit" className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transition-all hover:-translate-y-0.5">Save Technology</button>
         </div>
       </form>
     </div>

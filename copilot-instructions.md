@@ -68,7 +68,6 @@ src/
 │       └── hooks/
 │           ├── useProjectDetail.ts
 │           └── useProjects.ts
-├── router/               # Route configuration
 │   └── index.tsx        # React Router setup
 ├── types/               # TypeScript type definitions
 │   ├── achievementType.ts

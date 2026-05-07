@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
-
 import type { Achievement, Project } from '../../../../types';
 
 interface AchievementFormProps {
@@ -12,7 +11,6 @@ interface AchievementFormProps {
 
 export const AchievementForm = ({ initialData, projects, onSave, onCancel }: AchievementFormProps) => {
   
-  // 🌟 ใช้ Lazy Initialization เพื่อเซ็ตค่าเริ่มต้นตอนสร้างฟอร์ม (แก้ Error useEffect)
   const [formData, setFormData] = useState<Partial<Achievement>>(() => {
     if (initialData) {
       return {
@@ -44,34 +42,43 @@ export const AchievementForm = ({ initialData, projects, onSave, onCancel }: Ach
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8 animate-fade-in">
-      <h3 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
-        {initialData ? '✏️ Edit Achievement' : '✨ Add New Achievement'}
-      </h3>
+    // 🌟 เปลี่ยนกรอบให้เป็นสไตล์ Pop-up ไม่มี margin bottom
+    <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-2xl font-black text-slate-800 flex items-center gap-2">
+          {initialData ? '✏️ Edit Achievement' : '✨ Add New Achievement'}
+        </h3>
+        {/* 🌟 ปุ่ม X สำหรับปิด Pop-up */}
+        <button type="button" onClick={onCancel} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           
           <div className="md:col-span-2">
-            <label className="block text-sm font-bold text-slate-700 mb-1">Title *</label>
+            <label className="block text-sm font-bold text-slate-700 mb-1">Title (ชื่อรางวัล/การอบรม) *</label>
             <input
               type="text"
               name="title"
               required
               value={formData.title}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all"
               placeholder="e.g. Won 1st Place in Hackathon"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">Category *</label>
+            <label className="block text-sm font-bold text-slate-700 mb-1">Category (หมวดหมู่) *</label>
             <select
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all font-medium"
             >
               <option value="award">🏆 Award / Competition</option>
               <option value="training">📜 Training / Certificate</option>
@@ -79,44 +86,45 @@ export const AchievementForm = ({ initialData, projects, onSave, onCancel }: Ach
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-1">Date Achieved *</label>
+            <label className="block text-sm font-bold text-slate-700 mb-1">Date Achieved (วันที่ได้รับ) *</label>
             <input
               type="date"
               name="dateAchieved"
               required
               value={formData.dateAchieved}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all font-medium"
             />
           </div>
 
-          <div className="md:col-span-2">
-            <label className="block text-sm font-bold text-slate-700 mb-1">Related Project (Optional)</label>
+          <div className="md:col-span-2 p-5 bg-slate-50 rounded-2xl border border-slate-200">
+            <label className="block text-sm font-bold text-slate-700 mb-2">Related Project (โปรเจกต์ที่เกี่ยวข้อง - ถ้ามี)</label>
             <select
               name="projectID"
               value={formData.projectID || ''}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-white transition-all font-medium"
             >
               <option value="">-- ไม่ระบุโปรเจกต์ --</option>
               {projects.map(p => (
-                <option key={p.id} value={p.id}>{p.title}</option>
+                <option key={p.id} value={p.id}>📁 {p.title}</option>
               ))}
             </select>
+            <p className="text-xs text-slate-500 mt-2">หากรางวัลนี้เชื่อมโยงกับผลงานในระบบ คุณสามารถเลือกเพื่อเชื่อมโยงกันได้</p>
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 mt-6">
+        <div className="flex justify-end gap-3 pt-5 border-t border-slate-100">
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-2.5 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors"
+            className="px-6 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all"
+            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-0.5"
           >
             Save Achievement
           </button>

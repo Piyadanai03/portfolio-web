@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Project } from '../../../../types';
 
@@ -7,82 +8,120 @@ interface ProjectTableProps {
 }
 
 export const ProjectTable = ({ projects, onDelete }: ProjectTableProps) => {
+  const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
+
+  const toggleExpand = (projectId: string) => {
+    setExpandedRows(prev => ({
+      ...prev,
+      [projectId]: !prev[projectId]
+    }));
+  };
+
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden animate-fade-in">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-sm uppercase tracking-wider">
-              <th className="p-4 font-bold">Project Info</th>
-              <th className="p-4 font-bold hidden md:table-cell">Technologies</th>
-              <th className="p-4 font-bold text-right">Actions</th>
+              <th className="p-5 font-bold auto">Project Info</th>
+              {/* 🌟 1. ฟิกซ์ความกว้างคอลัมน์นี้ไว้ไม่ให้ยืด (เช่นกว้าง 280px) */}
+              <th className="p-5 font-bold hidden md:table-cell w-[280px] min-w-[280px]">Technologies</th>
+              <th className="p-5 font-bold text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {projects.map((project) => (
-              <tr key={project.id} className="hover:bg-slate-50 transition-colors">
-                
-                {/* คอลัมน์: รูปภาพและชื่อ */}
-                <td className="p-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-12 rounded-lg bg-slate-200 overflow-hidden shrink-0 border border-slate-200">
-                      <img 
-                        src={project.coverImageURL || 'https://placehold.co/100x100?text=No+Img'} 
-                        alt={project.title} 
-                        className="w-full h-full object-cover"
-                      />
+            {projects.map((project) => {
+              const isExpanded = expandedRows[project.id];
+              const displayTechs = isExpanded ? project.technologies : project.technologies?.slice(0, 4);
+              const hiddenCount = (project.technologies?.length || 0) - 4;
+
+              return (
+                <tr key={project.id} className="hover:bg-blue-50/50 transition-colors group">
+                  
+                  <td className="p-5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-20 h-14 rounded-xl bg-slate-100 overflow-hidden shrink-0 border border-slate-200 shadow-sm">
+                        <img 
+                          src={project.coverImageURL} 
+                          alt={project.title} 
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <div className="font-bold text-slate-900 text-lg line-clamp-1">{project.title}</div>
+                        <div className="text-sm text-slate-500 line-clamp-1 mt-0.5">{project.description}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-bold text-slate-900 line-clamp-1">{project.title}</div>
-                      <div className="text-xs text-slate-500 line-clamp-1">{project.description}</div>
+                  </td>
+
+                  {/* 🌟 2. จัดให้อยู่ด้านบน (align-top) เวลาปัดบรรทัดจะได้ไม่ดันข้อมูลอื่นเบี้ยว */}
+                  <td className="p-5 hidden md:table-cell align-top">
+                    {/* 🌟 3. บังคับ wrap และจำกัดความกว้างกล่องนี้ */}
+                    <div className="flex flex-wrap items-center gap-2 w-[240px]">
+                      {displayTechs?.map(tech => (
+                        <div 
+                          key={tech.id} 
+                          className="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center p-1.5 shrink-0 hover:scale-110 hover:-translate-y-1 transition-all"
+                          title={tech.name}
+                        >
+                          {tech.iconURL ? (
+                            <img src={tech.iconURL} alt={tech.name} className="w-full h-full object-contain" />
+                          ) : (
+                            <span className="text-[8px] font-black text-slate-400 uppercase">{tech.name.substring(0, 3)}</span>
+                          )}
+                        </div>
+                      ))}
+
+                      {/* 🌟 4. รวมเหลือปุ่มเดียว กดเพื่อสลับ ย่อ/ขยาย */}
+                      {hiddenCount > 0 && (
+                        <button 
+                          onClick={() => toggleExpand(project.id)}
+                          className={`w-8 h-8 rounded-full border text-xs font-bold flex items-center justify-center transition-all shadow-sm hover:scale-110 shrink-0 ${
+                            isExpanded 
+                              ? 'bg-blue-500 text-white border-blue-600 hover:bg-blue-600' // สีตอนขยาย (สีน้ำเงินเข้ม)
+                              : 'bg-slate-100 text-slate-500 border-slate-200 hover:bg-blue-100 hover:text-blue-600 hover:border-blue-300' // สีตอนย่อ (สีเทา)
+                          }`}
+                          title={isExpanded ? "ย่อเก็บ" : "ดูเพิ่มเติม"}
+                        >
+                          {isExpanded ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 15l7-7 7 7" /></svg> // ไอคอนลูกศรชี้ขึ้น
+                          ) : (
+                            `+${hiddenCount}` // ข้อความ +N
+                          )}
+                        </button>
+                      )}
                     </div>
-                  </div>
-                </td>
+                  </td>
 
-                {/* คอลัมน์: Tech Stack */}
-                <td className="p-4 hidden md:table-cell">
-                  <div className="flex flex-wrap gap-1">
-                    {project.technologies?.slice(0, 3).map(tech => (
-                      <span key={tech.id} className="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold rounded">
-                        {tech.name}
-                      </span>
-                    ))}
-                    {project.technologies && project.technologies.length > 3 && (
-                      <span className="px-2 py-1 bg-slate-100 text-slate-400 text-[10px] font-bold rounded">
-                        +{project.technologies.length - 3}
-                      </span>
-                    )}
-                  </div>
-                </td>
+                  <td className="p-5 align-top">
+                    <div className="flex items-center justify-end gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity mt-1">
+                      <Link 
+                        to={`/admin/projects/edit/${project.id}`} 
+                        className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-100 rounded-xl transition-colors" 
+                        title="Edit"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                      </Link>
+                      
+                      <button 
+                        onClick={() => onDelete(project.id)}
+                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-100 rounded-xl transition-colors" 
+                        title="Delete"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                    </div>
+                  </td>
 
-                {/* คอลัมน์: ปุ่มจัดการ */}
-                <td className="p-4">
-                  <div className="flex items-center justify-end gap-2">
-                    <Link to={`/admin/projects/edit/${project.id}`} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Edit">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                      </svg>
-                    </Link>
-                    
-                    <button 
-                      onClick={() => onDelete(project.id)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Delete"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                      </svg>
-                    </button>
-                  </div>
-                </td>
-
-              </tr>
-            ))}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         
         {projects.length === 0 && (
-          <div className="p-8 text-center text-slate-500">
-            ไม่มีข้อมูลโปรเจกต์ (กรุณากด Add New Project เพื่อเพิ่มใหม่)
+          <div className="p-12 text-center text-slate-400 bg-slate-50">
+            ไม่มีข้อมูลโปรเจกต์ (กรุณากด Add Project เพื่อเพิ่มใหม่)
           </div>
         )}
       </div>

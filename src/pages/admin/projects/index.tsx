@@ -10,21 +10,21 @@ const AdminProjectList = () => {
   }
 
   return (
-    <div>
+    <div className="max-w-6xl mx-auto pb-12">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-black text-slate-900 mb-2">Manage Projects</h1>
           <p className="text-slate-500">จัดการข้อมูลโปรเจกต์และผลงานทั้งหมดของคุณ</p>
         </div>
-        <Link to="/admin/projects/new" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-500/30">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-          </svg>
-          Add New Project
+        {/* 🌟 ปรับปุ่มให้เป็นสีดำ สไตล์เดียวกับหน้าอื่นๆ */}
+        <Link 
+          to="/admin/projects/new" 
+          className="flex items-center gap-2 bg-slate-900 hover:bg-black text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-lg hover:-translate-y-0.5"
+        >
+          <span className="text-xl">+</span> Add Project
         </Link>
       </div>
 
-      {/* 🌟 เรียกใช้ Component แบบคลีนๆ */}
       <ProjectTable projects={projects} onDelete={deleteProject} />
     </div>
   );

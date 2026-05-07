@@ -1,4 +1,4 @@
-import { AppRouter } from '../router';
+import { AppRouter } from '../pages';
 import './globals.css'
 
 function App() {

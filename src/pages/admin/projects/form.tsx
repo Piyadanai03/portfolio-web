@@ -3,16 +3,16 @@ import { Link } from "react-router-dom";
 import { useProjectForm } from "./hooks/useProjectForm";
 
 const AdminProjectForm = () => {
-  const { 
-    isEditMode, formData, previewCover, isLoading, isFetching, 
-    existingGallery, newGallery, 
-    availableTechs, selectedTechIds, 
-    handleChange, handleCoverChange, removeCover, 
-    handleAddGalleryImages, handleGalleryCaptionChange, 
+  const {
+    isEditMode, formData, previewCover, isLoading, isFetching,
+    existingGallery, newGallery,
+    availableTechs, selectedTechIds,
+    handleChange, handleCoverChange, removeCover,
+    handleAddGalleryImages, handleGalleryCaptionChange,
     handleExistingGalleryCaptionChange,
     removeNewGalleryImage, removeExistingGalleryImage,
     addTech, removeTech, // 🌟 ดึงฟังก์ชัน Add/Remove มาใช้
-    handleSubmit 
+    handleSubmit
   } = useProjectForm();
 
   // 🌟 State สำหรับระบบค้นหาใน Dropdown
@@ -25,7 +25,7 @@ const AdminProjectForm = () => {
 
   // 🌟 ตัวกรอง Tech ที่ยังไม่ได้เลือก และตรงกับคำค้นหา
   const unselectedTechs = availableTechs.filter(tech => !selectedTechIds.includes(tech.id));
-  const filteredTechs = unselectedTechs.filter(tech => 
+  const filteredTechs = unselectedTechs.filter(tech =>
     tech.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -44,7 +44,7 @@ const AdminProjectForm = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm animate-fade-in">
-        
+
         {/* ชื่อผลงาน & คำอธิบาย */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="md:col-span-2">
@@ -67,7 +67,7 @@ const AdminProjectForm = () => {
           </div>
 
           <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200">
-            
+
             {/* โชว์ Tag ที่ถูกเลือก (กดกากบาทลบได้) */}
             <div className="flex flex-wrap gap-2 mb-3">
               {selectedTechIds.map((techId) => {
@@ -109,7 +109,7 @@ const AdminProjectForm = () => {
                 placeholder="🔍 พิมพ์ค้นหาเทคโนโลยีเพื่อเพิ่ม..."
                 className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-white transition-colors"
               />
-              
+
               {/* รายการ Dropdown ที่โชว์เมื่อกำลังพิมพ์ หรือ Focus ช่องค้นหา */}
               {isDropdownOpen && filteredTechs.length > 0 && (
                 <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl max-h-56 overflow-y-auto">
@@ -118,7 +118,7 @@ const AdminProjectForm = () => {
                       key={tech.id}
                       // ใช้ onMouseDown เพื่อให้มันทำงานก่อนที่ Input จะเสีย Focus
                       onMouseDown={(e) => {
-                        e.preventDefault(); 
+                        e.preventDefault();
                         addTech(tech.id);
                         setSearchTerm(""); // เคลียร์ช่องค้นหา
                         setIsDropdownOpen(false); // ปิด Dropdown
@@ -138,9 +138,9 @@ const AdminProjectForm = () => {
 
               {/* กรณีพิมพ์หาแล้วไม่เจอ */}
               {isDropdownOpen && searchTerm !== "" && filteredTechs.length === 0 && (
-                 <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl p-4 text-center text-slate-500 text-sm">
-                    ไม่พบเทคโนโลยีที่คุณค้นหา
-                 </div>
+                <div className="absolute z-10 w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-xl p-4 text-center text-slate-500 text-sm">
+                  ไม่พบเทคโนโลยีที่คุณค้นหา
+                </div>
               )}
             </div>
           </div>
@@ -187,12 +187,12 @@ const AdminProjectForm = () => {
                 <div className="w-full h-32 rounded-lg overflow-hidden bg-slate-200 border border-slate-200">
                   <img src={img.imageURL} alt="Existing" className="w-full h-full object-cover" />
                 </div>
-                <textarea 
-                  value={img.caption || ""} 
+                <textarea
+                  value={img.caption || ""}
                   onChange={(e) => handleExistingGalleryCaptionChange(img.id, e.target.value)}
                   rows={1}
-                  className="w-full px-3 py-1.5 text-sm rounded border border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-slate-700 outline-none transition-all duration-300 resize-none h-[34px] focus:h-[80px] overflow-hidden focus:overflow-y-auto" 
-                  placeholder="เพิ่มคำบรรยาย (Caption)..." 
+                  className="w-full px-3 py-1.5 text-sm rounded border border-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-slate-700 outline-none transition-all duration-300 resize-none h-[34px] focus:h-[80px] overflow-hidden focus:overflow-y-auto"
+                  placeholder="เพิ่มคำบรรยาย (Caption)..."
                 />
                 <button type="button" onClick={() => removeExistingGalleryImage(img.id)} className="absolute top-4 right-4 p-1.5 bg-black/60 text-white rounded-lg hover:bg-red-500 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm shadow-sm">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -206,12 +206,12 @@ const AdminProjectForm = () => {
                 <div className="w-full h-32 rounded-lg overflow-hidden bg-slate-200 border border-blue-100">
                   <img src={item.preview} alt={`New ${index}`} className="w-full h-full object-cover" />
                 </div>
-                <textarea 
-                  value={item.caption} 
+                <textarea
+                  value={item.caption}
                   onChange={(e) => handleGalleryCaptionChange(index, e.target.value)}
                   rows={1}
-                  className="w-full px-3 py-1.5 text-sm rounded border border-blue-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-slate-700 outline-none transition-all duration-300 resize-none h-[34px] focus:h-[80px] overflow-hidden focus:overflow-y-auto" 
-                  placeholder="เพิ่มคำบรรยาย (Caption)..." 
+                  className="w-full px-3 py-1.5 text-sm rounded border border-blue-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white text-slate-700 outline-none transition-all duration-300 resize-none h-[34px] focus:h-[80px] overflow-hidden focus:overflow-y-auto"
+                  placeholder="เพิ่มคำบรรยาย (Caption)..."
                 />
                 <button type="button" onClick={() => removeNewGalleryImage(index)} className="absolute top-4 right-4 p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 shadow-lg">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -235,11 +235,17 @@ const AdminProjectForm = () => {
           <input type="url" name="githubURL" value={formData.githubURL} onChange={handleChange} className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-colors" placeholder="https://github.com/..." />
         </div>
 
-        {/* ปุ่มบันทึก */}
-        <div className="flex justify-end gap-3 pt-4">
-          <Link to="/admin/projects" className="px-6 py-3 font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Cancel</Link>
-          <button type="submit" disabled={isLoading} className="px-8 py-3 bg-blue-900 hover:bg-black text-white font-bold rounded-xl shadow-lg transition-all disabled:opacity-50 flex items-center gap-2">
-             {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : null}
+        {/* 🌟 ปุ่มบันทึกอัปเดตสไตล์ให้ตรงกับหน้าอื่น */}
+        <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
+          <Link to="/admin/projects" className="px-6 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors">
+            Cancel
+          </Link>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all disabled:opacity-50 flex items-center gap-2 hover:-translate-y-0.5"
+          >
+            {isLoading ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : null}
             {isLoading ? 'Saving...' : 'Save Project'}
           </button>
         </div>

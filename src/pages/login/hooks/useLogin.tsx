@@ -15,7 +15,7 @@ export const useLogin = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      navigate("/admin", { replace: true });
+      navigate("/admin/dashboard", { replace: true });
     }
   }, [navigate]);
 
@@ -32,7 +32,7 @@ export const useLogin = () => {
 
       const { token } = response.data;
       localStorage.setItem("token", token);
-      navigate("/admin");
+      navigate("/admin/dashboard");
       
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {

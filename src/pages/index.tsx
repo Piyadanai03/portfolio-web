@@ -1,17 +1,17 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import MainLayout from "../layouts";
-import HomePage from "../pages/home";
-import AboutPage from "../pages/about";
-import ProjectsPage from "../pages/projects";
-import ProjectDetailPage from "../pages/projects/detail";
-import LoginPage from "../pages/login";
+import HomePage from "./home";
+import AboutPage from "./about";
+import ProjectsPage from "./projects";
+import ProjectDetailPage from "./projects/detail";
+import LoginPage from "./login";
 import AdminLayout from "../layouts/AdminLayout";
-import AdminDashboard from "../pages/admin/dashboard";
-import AdminProjectList from "../pages/admin/projects";
-import AdminProjectForm from "../pages/admin/projects/form";
-import AdminAchievements from "../pages/admin/achievements";
-import AdminProfile from "../pages/admin/profile";
-import AdminTech from "../pages/admin/tech";
+import AdminDashboard from "./admin/dashboard";
+import AdminProjectList from "./admin/projects";
+import AdminProjectForm from "./admin/projects/form";
+import AdminAchievements from "./admin/achievements";
+import AdminProfile from "./admin/profile";
+import AdminTech from "./admin/tech";
 import { ProtectedRoute } from "../components/ProtectedRoute";
 
 const router = createBrowserRouter([
@@ -48,7 +48,7 @@ const router = createBrowserRouter([
       {
         element: <AdminLayout />,
         children: [
-          { index: true, element: <AdminDashboard /> },
+          { path: "dashboard", element: <AdminDashboard /> },
           { path: "projects", element: <AdminProjectList /> },
           { path: "projects/new", element: <AdminProjectForm /> },
           { path: "projects/edit/:id", element: <AdminProjectForm /> },
