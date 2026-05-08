@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { mockProjects } from '../../../../data/project';
-import { mockTechnologies } from '../../../../data/tech'; 
-import type { ProjectImage, Technology } from '../../../../types';
+import { publicApi, authApi } from '../../../../api/axios';
+import { mockTechnologies } from '../../../../data/tech';
+import type { ProjectImage, Technology, Project } from '../../../../types';
 
 export interface NewGalleryItem {
   file: File;
@@ -32,7 +32,6 @@ export const useProjectForm = () => {
   const [newGallery, setNewGallery] = useState<NewGalleryItem[]>([]); 
   const [deletedGalleryIds, setDeletedGalleryIds] = useState<string[]>([]); 
 
-  // State สำหรับ Tech Stack
   const [availableTechs, setAvailableTechs] = useState<Technology[]>([]); 
   const [selectedTechIds, setSelectedTechIds] = useState<string[]>([]); 
 
@@ -40,15 +39,19 @@ export const useProjectForm = () => {
     const fetchProjectData = async () => {
       setIsFetching(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 300));
+        // 🌟 ดึงข้อมูล Technologies มาเตรียมไว้ให้เลือก (ตอนนี้ใช้ mock ไปก่อน)
         setAvailableTechs(mockTechnologies);
 
         if (isEditMode) {
-          const existingProject = mockProjects.find((p) => p.id === id);
+          // 🌟 ดึงข้อมูลโปรเจกต์ทั้งหมดจาก Backend จริง ผ่าน publicApi
+          const response = await publicApi.get('/projects'); 
+          // หาโปรเจกต์ที่ตรงกับ ID ที่เรากำลังแก้ไข
+          const existingProject = response.data.find((p: Project) => p.id === id);
+
           if (existingProject) {
             setFormData({
               title: existingProject.title,
-              description: existingProject.description,
+              description: existingProject.description || "",
               githubURL: existingProject.githubURL || "",
             });
             if (existingProject.coverImageURL) {
@@ -58,10 +61,11 @@ export const useProjectForm = () => {
               setExistingGallery(existingProject.images);
             }
             if (existingProject.technologies) {
-              setSelectedTechIds(existingProject.technologies.map(t => t.id));
+              setSelectedTechIds(existingProject.technologies.map((t: Technology) => t.id));
             }
           }
         } else {
+          // เคลียร์ฟอร์มสำหรับโหมด "เพิ่มใหม่"
           setFormData({ title: "", description: "", githubURL: "" });
           setPreviewCover("");
           setSelectedCover(null);
@@ -70,6 +74,8 @@ export const useProjectForm = () => {
           setDeletedGalleryIds([]);
           setSelectedTechIds([]); 
         }
+      } catch (error) {
+        console.error("Error fetching project data:", error);
       } finally {
         setIsFetching(false);
       }
@@ -89,6 +95,7 @@ export const useProjectForm = () => {
       setPreviewCover(URL.createObjectURL(file));
     }
   };
+  
   const removeCover = () => {
     setSelectedCover(null);
     setPreviewCover("");
@@ -119,7 +126,6 @@ export const useProjectForm = () => {
     setDeletedGalleryIds(prev => [...prev, imageId]); 
   };
 
-  // 🌟 ฟังก์ชันเพิ่มและลบ Tech ออกจากลิตส์ที่เลือก
   const addTech = (techId: string) => {
     if (!selectedTechIds.includes(techId)) {
       setSelectedTechIds(prev => [...prev, techId]);
@@ -130,41 +136,70 @@ export const useProjectForm = () => {
     setSelectedTechIds(prev => prev.filter(id => id !== techId));
   };
 
+  // 🌟 ฟังก์ชันกดบันทึกข้อมูล (ยิง API จริงด้วย FormData)
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
       const submitData = new FormData();
+      
+      // 1. ข้อมูลพื้นฐาน
       submitData.append('title', formData.title);
       submitData.append('description', formData.description);
-      submitData.append('githubURL', formData.githubURL);
+      // แนบไปทั้ง 2 แบบป้องกันบั๊กการตั้ง Key ผิดพลาดระหว่าง Go/React
+      submitData.append('github_url', formData.githubURL); 
+      submitData.append('githubURL', formData.githubURL); 
       
-      if (selectedCover) submitData.append('coverImage', selectedCover);
+      // 2. ไฟล์รูปภาพหน้าปก (Cover Image)
+      if (selectedCover) {
+        submitData.append('coverImage', selectedCover); // เผื่อไว้
+        submitData.append('cover_image', selectedCover); // เปลี่ยน Key ให้ตรงกับที่ Go รับ
+      }
 
+      // 3. รูปภาพแกลลอรีที่เพิ่มใหม่
       newGallery.forEach((item) => {
         submitData.append('galleryImages', item.file);
         submitData.append('galleryCaptions', item.caption); 
       });
 
+      // 4. ข้อมูลการแก้ไขรูปภาพแกลลอรีเดิม
       existingGallery.forEach((img) => {
         submitData.append('existingImageIds', img.id);
         submitData.append('existingImageCaptions', img.caption || "");
       });
 
+      // 5. ไอดีของรูปภาพแกลลอรีที่ต้องการลบทิ้ง
       deletedGalleryIds.forEach(id => {
         submitData.append('deletedGalleryIds', id);
       });
 
+      // 6. ไอดีของเทคโนโลยี (Tech Stack) ที่ถูกเลือก
       selectedTechIds.forEach(id => {
         submitData.append('techIds', id); 
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert(isEditMode ? "อัปเดตข้อมูลสำเร็จ!" : "เพิ่มโปรเจกต์ใหม่สำเร็จ!");
+      // 🌟 ยิง API ไปที่ Backend ด้วย authApi
+      if (isEditMode) {
+        // โหมดแก้ไขโปรเจกต์เดิม (PUT)
+        await authApi.put(`/member/projects/${id}`, submitData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        alert("อัปเดตข้อมูลสำเร็จ!");
+      } else {
+        // โหมดสร้างโปรเจกต์ใหม่ (POST)
+        await authApi.post(`/member/projects`, submitData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        alert("เพิ่มโปรเจกต์ใหม่สำเร็จ!");
+      }
+
+      // บันทึกเสร็จให้เด้งกลับไปหน้าจัดการโปรเจกต์
       navigate("/admin/projects");
-    } catch {
-      alert("เกิดข้อผิดพลาดในการบันทึก");
+      
+    } catch (error) {
+      console.error("Submit Error:", error);
+      alert("เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่อีกครั้ง");
     } finally {
       setIsLoading(false);
     }
@@ -178,7 +213,7 @@ export const useProjectForm = () => {
     handleAddGalleryImages, handleGalleryCaptionChange, 
     handleExistingGalleryCaptionChange,
     removeNewGalleryImage, removeExistingGalleryImage, 
-    addTech, removeTech, // 🌟 ส่งตัวจัดการนี้ออกไปให้ UI
+    addTech, removeTech, 
     handleSubmit 
   };
 };

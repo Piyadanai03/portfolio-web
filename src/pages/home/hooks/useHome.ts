@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { User } from '../../../types';
-import { mockUser } from '../../../data';
+import { publicApi } from '../../../api/axios';
 
 export const useHome = () => {
   const [data, setData] = useState<User | null>(null);
@@ -8,11 +8,15 @@ export const useHome = () => {
 
   useEffect(() => {
     const fetchHomeData = async () => {
-      setLoading(true);
-      setTimeout(() => {
-        setData(mockUser);
+      try {
+        // 🌟 ยิง API ไปหา Backend
+        const response = await publicApi.get('/home'); 
+        setData(response.data);
+      } catch (error) {
+        console.error("Error fetching home data:", error);
+      } finally {
         setLoading(false);
-      }, 500);
+      }
     };
 
     fetchHomeData();
