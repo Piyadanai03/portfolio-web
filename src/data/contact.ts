@@ -1,4 +1,4 @@
-import type { Contact } from '../types';
+import type { Contact } from '../types/contactType';
 
 export const USER_ID = "4ed6694f-bca5-4707-9af5-1d3b915452bb";
 
