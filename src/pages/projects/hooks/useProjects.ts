@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Project } from '../../../types';
-import { mockProjects } from '../../../data';
+import { publicApi } from '../../../api/axios';
 
 export const useProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -8,13 +8,19 @@ export const useProjects = () => {
 
   useEffect(() => {
     const fetchProjects = async () => {
-      setLoading(true);
-      // จำลองการโหลดข้อมูล 0.5 วินาที
-      // (เมื่อต่อ API จริง ให้เปลี่ยนเป็น axios.get('/projects') ที่นี่)
-      setTimeout(() => {
-        setProjects(mockProjects);
+      try {
+        setLoading(true);
+
+        const response = await publicApi.get('/projects');
+
+        setProjects(response.data);
+
+      } catch (error) {
+        console.error('Fetch projects error:', error);
+
+      } finally {
         setLoading(false);
-      }, 500);
+      }
     };
 
     fetchProjects();

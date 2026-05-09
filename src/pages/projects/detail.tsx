@@ -2,9 +2,8 @@ import { useParams, Link } from "react-router-dom";
 import { useProjectDetail } from "./hooks/useProjectDetail";
 
 const ProjectDetailPage = () => {
-  // ดึง ID จาก URL (เช่น /projects/proj-01 จะได้ id = "proj-01")
   const { id } = useParams<{ id: string }>();
-  const { project, relatedAchievements, loading } = useProjectDetail(id);
+  const { project, loading } = useProjectDetail(id);
 
   if (loading) {
     return (
@@ -62,7 +61,7 @@ const ProjectDetailPage = () => {
 
       {/* หัวข้อและ Tech Stack */}
       <div className="mb-10">
-        {relatedAchievements.length > 0 && (
+        {/* {relatedAchievements.length > 0 && (
           <div className="mb-6 space-y-3">
             {relatedAchievements.map(ach => (
               <div key={ach.id} className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
@@ -76,7 +75,7 @@ const ProjectDetailPage = () => {
               </div>
             ))}
           </div>
-        )}
+        )} */}
         <h1 className="text-4xl font-black text-slate-900 mb-4">
           {project.title}
         </h1>

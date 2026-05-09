@@ -19,3 +19,15 @@ export interface Project {
   images?: ProjectImage[];
   technologies?: Technology[];
 }
+
+export interface NewGalleryItem {
+  file: File;
+  preview: string;
+  caption: string;
+}
+
+export interface ProjectFormData {
+  title: string;
+  description: string;
+  githubURL: string;
+}

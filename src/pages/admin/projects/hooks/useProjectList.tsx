@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Project } from '../../../../types';
-import { publicApi, authApi } from '../../../../api/axios';
+import { authApi } from '../../../../api/axios';
 
 export const useProjectList = () => {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -9,7 +9,7 @@ export const useProjectList = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await publicApi.get('/projects'); 
+        const response = await authApi.get('/projects'); 
         setProjects(response.data);
       } catch (error) {
         console.error("Error fetching projects", error);
