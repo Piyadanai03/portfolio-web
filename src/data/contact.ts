@@ -5,7 +5,7 @@ export const USER_ID = "4ed6694f-bca5-4707-9af5-1d3b915452bb";
 export const mockContacts: Contact[] = [
   {
     id: "contact-01",
-    userID: USER_ID,
+    // userID: USER_ID,
     platformName: "GitHub",
     urlValue: "https://github.com/Piyadanai03",
     iconURL: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg",
@@ -13,7 +13,7 @@ export const mockContacts: Contact[] = [
   },
   {
     id: "contact-02",
-    userID: USER_ID,
+    // userID: USER_ID,
     platformName: "GitHub (Academic Projects)",
     urlValue: "https://github.com/Piyadanai03/Project_Final",
     iconURL: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg",
@@ -21,7 +21,7 @@ export const mockContacts: Contact[] = [
   },
   {
     id: "contact-03",
-    userID: USER_ID,
+    // userID: USER_ID,
     platformName: "Fastwork",
     urlValue: "https://fastwork.co/user/piyadanai32",
     iconURL: "data:image/png;base64,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",
@@ -29,7 +29,7 @@ export const mockContacts: Contact[] = [
   },
   {
     id: "contact-04",
-    userID: USER_ID,
+    // userID: USER_ID,
     platformName: "Phone",
     urlValue: "061-1234-5678",
     iconURL: "",
@@ -37,7 +37,7 @@ export const mockContacts: Contact[] = [
   },
   {
     id: "contact-05",
-    userID: USER_ID,
+    // userID: USER_ID,
     platformName: "Email",
     urlValue: "piyadanai32@example.com",
     iconURL: "",
