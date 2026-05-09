@@ -4,5 +4,4 @@ export interface Contact {
   urlValue: string;
   iconURL?: string;
   isActive: boolean;
-  userID: string;
 }
