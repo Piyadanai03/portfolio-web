@@ -1,4 +1,5 @@
 import type { Technology } from './techType';
+import type { Experience } from './resumeType';
 
 export interface ProjectImage {
   id: string;
@@ -14,10 +15,12 @@ export interface Project {
   description: string;
   coverImageURL: string;
   githubURL: string;
+  experienceID?: string; // ไอดีของประสบการณ์ทำงาน (optional)
   createdAt: string;
   // Relationships จากการ Preload
   images?: ProjectImage[];
   technologies?: Technology[];
+  experience?: Experience; // ข้อมูลประสบการณ์ที่เชื่อมโยง
 }
 
 export interface NewGalleryItem {

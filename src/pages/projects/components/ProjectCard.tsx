@@ -20,6 +20,18 @@ const ProjectCard = ({ project }: Props) => {
       </div>
 
       <div className="p-6 flex flex-col flex-grow">
+        {/* Experience Badge */}
+        {project.experience && (
+          <div className="mb-3 flex items-start gap-2">
+            <span className="text-lg">💼</span>
+            <div className="flex-1">
+              <p className="text-xs font-bold text-amber-700 uppercase tracking-wider">Work Experience</p>
+              <p className="text-sm font-semibold text-slate-900">{project.experience.jobTitle}</p>
+              <p className="text-xs text-slate-500">{project.experience.company}</p>
+            </div>
+          </div>
+        )}
+
         {/* Tech Stack Badges */}
         {project.technologies && project.technologies.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-3">

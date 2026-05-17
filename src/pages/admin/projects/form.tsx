@@ -7,12 +7,14 @@ const AdminProjectForm = () => {
     isEditMode, formData, previewCover, isLoading, isFetching,
     existingGallery, newGallery,
     availableTechs, selectedTechIds,
+    availableExperiences, selectedExperienceId,
     handleChange, handleCoverChange, removeCover,
     handleAddGalleryImages, handleGalleryCaptionChange,
     handleExistingGalleryCaptionChange,
     removeNewGalleryImage, removeExistingGalleryImage,
     addTech, removeTech, // 🌟 ดึงฟังก์ชัน Add/Remove มาใช้
-    handleSubmit
+    handleSubmit,
+    setSelectedExperienceId
   } = useProjectForm();
 
   // 🌟 State สำหรับระบบค้นหาใน Dropdown
@@ -55,6 +57,26 @@ const AdminProjectForm = () => {
             <label className="block text-sm font-bold text-slate-700 mb-2">Description (คำอธิบาย) *</label>
             <textarea name="description" value={formData.description} onChange={handleChange} required rows={4} className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-colors resize-y" placeholder="อธิบายว่าโปรเจกต์นี้ทำอะไร..." />
           </div>
+        </div>
+
+        <hr className="border-slate-100" />
+
+        {/* 🌟 เลือกประสบการณ์ทำงาน */}
+        <div>
+          <label className="block text-sm font-bold text-slate-700 mb-2">Work Experience (ประสบการณ์ที่เกี่ยวข้อง)</label>
+          <p className="text-sm text-slate-500 mb-3">เลือกประสบการณ์ทำงานที่โปรเจกต์นี้เกี่ยวข้อง (ไม่บังคับ)</p>
+          <select 
+            value={selectedExperienceId} 
+            onChange={(e) => setSelectedExperienceId(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-colors"
+          >
+            <option value="">-- ไม่เลือกประสบการณ์ --</option>
+            {availableExperiences.map((exp) => (
+              <option key={exp.id} value={exp.id}>
+                {exp.jobTitle} @ {exp.company}
+              </option>
+            ))}
+          </select>
         </div>
 
         <hr className="border-slate-100" />

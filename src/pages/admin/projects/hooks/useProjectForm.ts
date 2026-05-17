@@ -3,6 +3,7 @@ import type { ChangeEvent, FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { authApi, publicApi } from '../../../../api/axios';
 import type { ProjectImage, Technology, Project , NewGalleryItem , ProjectFormData} from '../../../../types';
+import type { Experience } from '../../../../types/resumeType';
 
 export const useProjectForm = () => {
   const navigate = useNavigate();
@@ -28,12 +29,19 @@ export const useProjectForm = () => {
   const [availableTechs, setAvailableTechs] = useState<Technology[]>([]); 
   const [selectedTechIds, setSelectedTechIds] = useState<string[]>([]); 
 
+  const [availableExperiences, setAvailableExperiences] = useState<Experience[]>([]);
+  const [selectedExperienceId, setSelectedExperienceId] = useState<string>("");
+
   useEffect(() => {
     const fetchProjectData = async () => {
       setIsFetching(true);
       try {
         const techResponse = await authApi.get('/member/tech');
         setAvailableTechs(techResponse.data);
+
+        // Fetch experiences
+        const experienceResponse = await authApi.get('/member/experiences');
+        setAvailableExperiences(experienceResponse.data || []);
 
         if (isEditMode) {
           const response = await publicApi.get('/projects'); 
@@ -54,6 +62,9 @@ export const useProjectForm = () => {
             if (existingProject.technologies) {
               setSelectedTechIds(existingProject.technologies.map((t: Technology) => t.id));
             }
+            if (existingProject.experienceID) {
+              setSelectedExperienceId(existingProject.experienceID);
+            }
           }
         } else {
           setFormData({ title: "", description: "", githubURL: "" });
@@ -62,7 +73,8 @@ export const useProjectForm = () => {
           setExistingGallery([]);
           setNewGallery([]);
           setDeletedGalleryIds([]);
-          setSelectedTechIds([]); 
+          setSelectedTechIds([]);
+          setSelectedExperienceId("");
         }
       } catch (error) {
         console.error("Error fetching project data:", error);
@@ -135,7 +147,11 @@ export const useProjectForm = () => {
       
       submitData.append('title', formData.title);
       submitData.append('description', formData.description);
-      submitData.append('githubURL', formData.githubURL); 
+      submitData.append('githubURL', formData.githubURL);
+      
+      if (selectedExperienceId) {
+        submitData.append('experienceID', selectedExperienceId);
+      }
       
       if (selectedCover) {
         submitData.append('coverImage', selectedCover);
@@ -184,12 +200,14 @@ export const useProjectForm = () => {
   return { 
     isEditMode, formData, previewCover, isLoading, isFetching, 
     existingGallery, newGallery, 
-    availableTechs, selectedTechIds, 
+    availableTechs, selectedTechIds,
+    availableExperiences, selectedExperienceId,
     handleChange, handleCoverChange, removeCover, 
     handleAddGalleryImages, handleGalleryCaptionChange, 
     handleExistingGalleryCaptionChange,
     removeNewGalleryImage, removeExistingGalleryImage, 
-    addTech, removeTech, 
-    handleSubmit 
+    addTech, removeTech,
+    handleSubmit,
+    setSelectedExperienceId
   };
 };

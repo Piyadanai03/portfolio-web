@@ -24,6 +24,7 @@ export const ProjectTable = ({ projects, onDelete }: ProjectTableProps) => {
           <thead>
             <tr className="bg-slate-50 border-b border-slate-200 text-slate-500 text-sm uppercase tracking-wider">
               <th className="p-5 font-bold auto">Project Info</th>
+              <th className="p-5 font-bold hidden md:table-cell">Work Experience</th>
               {/* 🌟 1. ฟิกซ์ความกว้างคอลัมน์นี้ไว้ไม่ให้ยืด (เช่นกว้าง 280px) */}
               <th className="p-5 font-bold hidden md:table-cell w-[280px] min-w-[280px]">Technologies</th>
               <th className="p-5 font-bold text-right">Actions</th>
@@ -52,6 +53,18 @@ export const ProjectTable = ({ projects, onDelete }: ProjectTableProps) => {
                         <div className="text-sm text-slate-500 line-clamp-1 mt-0.5">{project.description}</div>
                       </div>
                     </div>
+                  </td>
+
+                  {/* 🌟 Experience Column */}
+                  <td className="p-5 hidden md:table-cell align-top">
+                    {project.experience ? (
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-sm">
+                        <p className="font-bold text-amber-900">{project.experience.jobTitle}</p>
+                        <p className="text-amber-700 text-xs">{project.experience.company}</p>
+                      </div>
+                    ) : (
+                      <span className="text-slate-400 text-sm">-</span>
+                    )}
                   </td>
 
                   {/* 🌟 2. จัดให้อยู่ด้านบน (align-top) เวลาปัดบรรทัดจะได้ไม่ดันข้อมูลอื่นเบี้ยว */}

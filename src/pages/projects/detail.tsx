@@ -80,6 +80,20 @@ const ProjectDetailPage = () => {
           {project.title}
         </h1>
 
+        {/* Experience Information */}
+        {project.experience && (
+          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl mt-0.5">💼</span>
+              <div>
+                <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">Related Work Experience</p>
+                <p className="text-lg font-bold text-slate-900">{project.experience.jobTitle}</p>
+                <p className="text-sm text-slate-600">{project.experience.company}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {project.technologies && project.technologies.length > 0 && (
           <div className="flex flex-wrap gap-3 mb-6">
             {project.technologies.map((tech) => (
