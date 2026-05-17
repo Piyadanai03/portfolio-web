@@ -12,6 +12,7 @@ import AdminProjectForm from "./admin/projects/form";
 import AdminAchievements from "./admin/achievements";
 import AdminProfile from "./admin/profile";
 import AdminTech from "./admin/tech";
+import AdminEducation from "./admin/education";
 import { ProtectedRoute } from "../components/ProtectedRoute";
 
 const router = createBrowserRouter([
@@ -55,6 +56,7 @@ const router = createBrowserRouter([
           { path: "achievements", element: <AdminAchievements /> },
           { path: "profile", element: <AdminProfile /> },
           { path: "tech", element: <AdminTech /> },
+          { path: "education", element: <AdminEducation /> },
         ],
       },
     ],

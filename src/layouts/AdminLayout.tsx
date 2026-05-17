@@ -4,7 +4,7 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // 🌟 1. State ควบคุมการเปิด/ปิดเมนูบนมือถือและ iPad
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -26,23 +26,21 @@ const AdminLayout = () => {
     { path: "/admin/profile", label: "My Profile", icon: "👤" },
     { path: "/admin/projects", label: "Manage Projects", icon: "📁" },
     { path: "/admin/achievements", label: "Achievements", icon: "🏆" },
-    { path: "/admin/tech", label: "Technologies", icon: "💻" }
+    { path: "/admin/tech", label: "Technologies", icon: "💻" },
+    { path: "/admin/education", label: "Education", icon: "📚" },
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 flex overflow-hidden">
-      
-      {/* 🌟 2. Overlay (ฉากหลังสีดำโปร่งแสง) จะโชว์เฉพาะตอนเปิดเมนูบนมือถือ */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-slate-900/60 z-40 lg:hidden backdrop-blur-sm transition-opacity"
           onClick={closeMenu}
         />
       )}
 
       {/* 📍 Sidebar (เมนูด้านข้าง) */}
-      {/* 🌟 3. ปรับ Class ให้ลอยทับหน้าจอ (fixed) บนมือถือ และกลับมาเป็นปกติ (relative) บนจอใหญ่ (lg) */}
-      <aside 
+      <aside
         className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
@@ -55,9 +53,23 @@ const AdminLayout = () => {
             <p className="text-slate-400 text-xs mt-1">Portfolio Manager</p>
           </div>
           {/* ปุ่มปิด (X) สำหรับมือถือ */}
-          <button onClick={closeMenu} className="p-2 text-slate-400 hover:text-white lg:hidden">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          <button
+            onClick={closeMenu}
+            className="p-2 text-slate-400 hover:text-white lg:hidden"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-6 h-6"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -66,7 +78,8 @@ const AdminLayout = () => {
           {menuItems.map((item) => {
             const isActive =
               location.pathname === item.path ||
-              (item.path !== "/admin" && location.pathname.startsWith(item.path));
+              (item.path !== "/admin" &&
+                location.pathname.startsWith(item.path));
 
             return (
               <Link
@@ -99,22 +112,34 @@ const AdminLayout = () => {
 
       {/* 📍 Main Content (เนื้อหาตรงกลาง) */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden w-full">
-        
         {/* Header แถบบน */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-8 shrink-0">
           <div className="flex items-center gap-4">
             {/* 🌟 5. ปุ่ม Hamburger สำหรับเปิดเมนูบนมือถือ/iPad */}
-            <button 
+            <button
               onClick={() => setIsMobileMenuOpen(true)}
               className="p-2 -ml-2 bg-slate-50 text-slate-600 rounded-lg hover:bg-slate-100 lg:hidden"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                />
               </svg>
             </button>
-            <h2 className="font-bold text-slate-700 hidden sm:block">Admin Workspace</h2>
+            <h2 className="font-bold text-slate-700 hidden sm:block">
+              Admin Workspace
+            </h2>
           </div>
-          
+
           <div className="flex items-center gap-3">
             <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
               P
@@ -128,7 +153,6 @@ const AdminLayout = () => {
           <Outlet />
         </div>
       </main>
-
     </div>
   );
 };
