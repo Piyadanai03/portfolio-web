@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react';
-import { authApi, publicApi } from '../../../../api/axios';
+import { isAxiosError } from 'axios';
+import { authApi } from '../../../../api/axios';
 import type { Study } from '../../../../types';
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (isAxiosError(error) && error.response?.data?.error) {
+    return error.response.data.error;
+  }
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return fallback;
+};
 
 export const useEducation = () => {
   const [educationList, setEducationList] = useState<Study[]>([]);
@@ -12,11 +23,11 @@ export const useEducation = () => {
     const fetchEducation = async () => {
       try {
         setIsLoading(true);
-        const response = await publicApi.get('/educations');
+        const response = await authApi.get('/member/education');
         setEducationList(response.data || []);
         setError(null);
-      } catch (err) {
-        console.error('Error fetching educations:', err);
+      } catch (error: unknown) {
+        console.error('Error fetching educations:', error);
         setError('ไม่สามารถดึงข้อมูลการศึกษาได้');
         setEducationList([]);
       } finally {
@@ -42,9 +53,9 @@ export const useEducation = () => {
         setEducationList(prev => [response.data.data, ...prev]);
       }
       return response.data;
-    } catch (err: any) {
-      const errorMsg = err.response?.data?.error || 'เพิ่มข้อมูลการศึกษาไม่สำเร็จ';
-      console.error('Error adding education:', err);
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, 'เพิ่มข้อมูลการศึกษาไม่สำเร็จ');
+      console.error('Error adding education:', error);
       throw new Error(errorMsg);
     }
   };
@@ -67,9 +78,9 @@ export const useEducation = () => {
         );
       }
       return response.data;
-    } catch (err: any) {
-      const errorMsg = err.response?.data?.error || 'แก้ไขข้อมูลการศึกษาไม่สำเร็จ';
-      console.error('Error updating education:', err);
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, 'แก้ไขข้อมูลการศึกษาไม่สำเร็จ');
+      console.error('Error updating education:', error);
       throw new Error(errorMsg);
     }
   };
@@ -82,9 +93,9 @@ export const useEducation = () => {
     try {
       await authApi.delete(`/member/education/${id}`);
       setEducationList(prev => prev.filter(e => e.id !== id));
-    } catch (err: any) {
-      const errorMsg = err.response?.data?.error || 'ลบข้อมูลการศึกษาไม่สำเร็จ';
-      console.error('Error deleting education:', err);
+    } catch (error: unknown) {
+      const errorMsg = getErrorMessage(error, 'ลบข้อมูลการศึกษาไม่สำเร็จ');
+      console.error('Error deleting education:', error);
       throw new Error(errorMsg);
     }
   };
