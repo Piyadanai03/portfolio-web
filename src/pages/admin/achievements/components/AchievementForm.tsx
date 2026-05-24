@@ -7,15 +7,17 @@ interface AchievementFormProps {
   projects: Project[];
   onSave: (data: Partial<Achievement>) => void;
   onCancel: () => void;
+  isLoading?: boolean;
 }
 
-export const AchievementForm = ({ initialData, projects, onSave, onCancel }: AchievementFormProps) => {
+export const AchievementForm = ({ initialData, projects, onSave, onCancel, isLoading = false }: AchievementFormProps) => {
   
   const [formData, setFormData] = useState<Partial<Achievement>>(() => {
     if (initialData) {
       return {
         ...initialData,
-        dateAchieved: initialData.dateAchieved.split('T')[0]
+        dateAchieved: initialData.dateAchieved ? initialData.dateAchieved.split('T')[0] : new Date().toISOString().split('T')[0],
+        projectID: initialData.projectID || '' // 🌟 ดึงค่าเดิมมาแสดง ถ้าไม่มีให้เป็นค่าว่าง
       };
     }
     return {
@@ -35,20 +37,19 @@ export const AchievementForm = ({ initialData, projects, onSave, onCancel }: Ach
     e.preventDefault();
     const finalData = {
       ...formData,
-      dateAchieved: new Date(formData.dateAchieved || '').toISOString(),
-      projectID: formData.projectID === '' ? undefined : formData.projectID
+      dateAchieved: formData.dateAchieved ? `${formData.dateAchieved}T00:00:00Z` : new Date().toISOString(),
+      // 🌟 ถ้าเลือก "-- ไม่ระบุโปรเจกต์ --" ให้ส่ง null ไปเพื่อลบค่าใน Database
+      projectID: formData.projectID === '' ? null : formData.projectID 
     };
     onSave(finalData);
   };
 
   return (
-    // 🌟 เปลี่ยนกรอบให้เป็นสไตล์ Pop-up ไม่มี margin bottom
     <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-2xl font-black text-slate-800 flex items-center gap-2">
           {initialData ? '✏️ Edit Achievement' : '✨ Add New Achievement'}
         </h3>
-        {/* 🌟 ปุ่ม X สำหรับปิด Pop-up */}
         <button type="button" onClick={onCancel} className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -118,15 +119,17 @@ export const AchievementForm = ({ initialData, projects, onSave, onCancel }: Ach
           <button
             type="button"
             onClick={onCancel}
-            className="px-6 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors"
+            disabled={isLoading}
+            className="px-6 py-3 font-bold text-slate-500 hover:bg-slate-100 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-0.5"
+            disabled={isLoading}
+            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
           >
-            Save Achievement
+            {isLoading ? 'Saving...' : 'Save Achievement'}
           </button>
         </div>
       </form>

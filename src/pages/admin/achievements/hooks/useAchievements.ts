@@ -1,23 +1,44 @@
 import { useState, useEffect } from 'react';
+import { isAxiosError } from 'axios';
+import { authApi, publicApi } from '../../../../api/axios';
 import type { Achievement, Project } from '../../../../types';
-// อิมพอร์ตข้อมูล Mock มาใช้งาน (ถ้าต่อ API จริงค่อยเปลี่ยนเป็น authApi.get)
-import { mockAchievements, mockProjects } from '../../../../data/project';
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (isAxiosError(error) && error.response?.data?.error) {
+    return error.response.data.error;
+  }
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+  return fallback;
+};
 
 export const useAchievements = () => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // ดึงข้อมูลเมื่อเปิดหน้า
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // จำลองการโหลดข้อมูล 0.5 วินาที
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setAchievements(mockAchievements);
-        setProjects(mockProjects); // ดึงโปรเจกต์มาทำ Dropdown
-      } catch (error) {
-        console.error("Error fetching data", error);
+        setIsLoading(true);
+        setError(null);
+        
+        // ดึง Achievements
+        const achResponse = await authApi.get('/member/achievement');
+        const achData = Array.isArray(achResponse.data) ? achResponse.data : achResponse.data?.achievements || [];
+        setAchievements(achData);
+        
+        // ดึง Projects สำหรับ Dropdown
+        const projResponse = await publicApi.get('/projects');
+        const projData = Array.isArray(projResponse.data) ? projResponse.data : projResponse.data?.projects || [];
+        setProjects(projData);
+      } catch (err: unknown) {
+        console.error("Error fetching data", err);
+        setError(getErrorMessage(err, 'ไม่สามารถดึงข้อมูลได้'));
+        setAchievements([]);
+        setProjects([]);
       } finally {
         setIsLoading(false);
       }
@@ -25,27 +46,60 @@ export const useAchievements = () => {
     fetchData();
   }, []);
 
-  // ฟังก์ชันลบ
-  const deleteAchievement = async (id: string) => {
-    if (window.confirm('คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?')) {
-      // จำลองการลบ
-      setAchievements(prev => prev.filter(item => item.id !== id));
+  const addAchievement = async (newData: Partial<Achievement>) => {
+    try {
+      const response = await authApi.post('/member/achievement', {
+        title: newData.title,
+        category: newData.category,
+        dateAchieved: newData.dateAchieved,
+        projectID: newData.projectID !== undefined ? newData.projectID : null, // 🌟 ปรับให้รับค่า null ได้
+      });
+      
+      const newAchievement = response.data?.achievement || response.data;
+      setAchievements(prev => [newAchievement, ...prev]);
+      return response.data;
+    } catch (err: unknown) {
+      const errorMsg = getErrorMessage(err, 'เพิ่มข้อมูลความสำเร็จไม่สำเร็จ');
+      console.error('Error adding achievement:', err);
+      throw new Error(errorMsg);
     }
   };
 
-  // ฟังก์ชันบันทึก (เพิ่ม/แก้ไข)
+  const updateAchievement = async (id: string, updatedData: Partial<Achievement>) => {
+    try {
+      const response = await authApi.put(`/member/achievement/${id}`, {
+        title: updatedData.title,
+        category: updatedData.category,
+        dateAchieved: updatedData.dateAchieved,
+        projectID: updatedData.projectID !== undefined ? updatedData.projectID : null, // 🌟 ปรับให้รับค่า null ได้
+      });
+      
+      const updated = response.data?.achievement || response.data;
+      setAchievements(prev => prev.map(item => item.id === id ? updated : item));
+      return response.data;
+    } catch (err: unknown) {
+      const errorMsg = getErrorMessage(err, 'แก้ไขข้อมูลความสำเร็จไม่สำเร็จ');
+      console.error('Error updating achievement:', err);
+      throw new Error(errorMsg);
+    }
+  };
+
+  const deleteAchievement = async (id: string) => {
+    try {
+      await authApi.delete(`/member/achievement/${id}`);
+      setAchievements(prev => prev.filter(item => item.id !== id));
+    } catch (err: unknown) {
+      const errorMsg = getErrorMessage(err, 'ลบข้อมูลความสำเร็จไม่สำเร็จ');
+      console.error('Error deleting achievement:', err);
+      throw new Error(errorMsg);
+    }
+  };
+
   const saveAchievement = async (data: Partial<Achievement>) => {
-    // ถ้ามี ID แปลว่าเป็นการ "แก้ไข"
     if (data.id) {
-      setAchievements(prev => prev.map(item => item.id === data.id ? { ...item, ...data } as Achievement : item));
+      return updateAchievement(data.id, data);
     } else {
-      // ถ้าไม่มี ID แปลว่า "เพิ่มใหม่"
-      const newAchievement: Achievement = {
-        ...data,
-        id: `achv-${Date.now()}`, // จำลองการสร้าง ID ใหม่
-        userID: 'user-01',
-      } as Achievement;
-      setAchievements([newAchievement, ...achievements]);
+      return addAchievement(data);
     }
   };
 
@@ -53,6 +107,7 @@ export const useAchievements = () => {
     achievements,
     projects,
     isLoading,
+    error,
     deleteAchievement,
     saveAchievement
   };
