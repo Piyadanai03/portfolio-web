@@ -14,5 +14,7 @@ export interface Study {
   degree: string;
   major: string;
   institution: string;
+  faculty: string;
+  gpa?: number;
   graduationDate: string;
 }

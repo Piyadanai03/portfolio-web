@@ -6,6 +6,7 @@ export interface User {
   id: string;
   username: string;
   fullName: string;
+  position: string;
   bioText: string;
   address: string;
   profileImageURL: string;
