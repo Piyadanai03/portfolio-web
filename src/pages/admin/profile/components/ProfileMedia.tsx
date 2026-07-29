@@ -4,7 +4,6 @@ import type { ProfileData } from '../hooks/useProfile';
 interface ProfileMediaProps {
   profile: ProfileData;
   setProfile: Dispatch<SetStateAction<ProfileData>>;
-  // 🌟 เพิ่ม Props สำหรับเซ็ตไฟล์จริง
   setProfileFile: Dispatch<SetStateAction<File | null>>;
   setResumeFile: Dispatch<SetStateAction<File | null>>;
 }
@@ -20,19 +19,28 @@ export const ProfileMedia = ({ profile, setProfile, setProfileFile, setResumeFil
       return; 
     }
 
-    // 🌟 1. เก็บไฟล์ตัวจริงลงใน State เพื่อเตรียมส่งให้ Backend
+    // 🌟 1. เก็บไฟล์ และ "เคลียร์ข้อความ URL เดิม" ทิ้ง
     if (field === 'profileImageURL') {
       setProfileFile(file);
+      setProfile(prev => ({ ...prev, profileImageURL: '' }));
     } else if (field === 'resumeURL') {
       setResumeFile(file);
+      setProfile(prev => ({ ...prev, resumeURL: '' }));
     }
 
-    // 🌟 2. สร้าง Base64 เพื่อให้หน้าเว็บแสดงผล Preview ได้ทันที
+    // 🌟 2. อ่านไฟล์และโชว์ Preview ทันที
     const reader = new FileReader();
     reader.onloadend = () => {
       setProfile(prev => ({ ...prev, [field]: reader.result as string }));
     };
     reader.readAsDataURL(file);
+  };
+
+  // 🌟 ฟังก์ชันจัดการตอนวางลิงก์ URL (พิมพ์ปุ๊บ แสดงปั๊บ และเคลียร์ไฟล์อัปโหลดทิ้ง)
+  const handleURLChange = (val: string, field: 'profileImageURL' | 'resumeURL') => {
+    setProfile(prev => ({ ...prev, [field]: val }));
+    if (field === 'profileImageURL') setProfileFile(null);
+    if (field === 'resumeURL') setResumeFile(null);
   };
 
   return (
@@ -57,7 +65,7 @@ export const ProfileMedia = ({ profile, setProfile, setProfileFile, setResumeFil
             <input
               type="url"
               value={profile.profileImageURL}
-              onChange={(e) => setProfile(prev => ({ ...prev, profileImageURL: e.target.value }))}
+              onChange={(e) => handleURLChange(e.target.value, 'profileImageURL')} // 🌟 อัปเกรดให้เปลี่ยนแบบ Real-time
               className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 bg-slate-50 focus:bg-white transition-all text-sm"
               placeholder="https://... (วางลิงก์รูปภาพ)"
             />
@@ -79,7 +87,7 @@ export const ProfileMedia = ({ profile, setProfile, setProfileFile, setResumeFil
             <input
               type="url"
               value={profile.resumeURL}
-              onChange={(e) => setProfile(prev => ({ ...prev, resumeURL: e.target.value }))}
+              onChange={(e) => handleURLChange(e.target.value, 'resumeURL')} // 🌟 อัปเกรดให้เปลี่ยนแบบ Real-time
               className="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 bg-white transition-all text-sm"
               placeholder="https://... (ลิงก์ไฟล์ PDF)"
             />
@@ -89,7 +97,7 @@ export const ProfileMedia = ({ profile, setProfile, setProfileFile, setResumeFil
              <label className="cursor-pointer bg-purple-100 hover:bg-purple-200 text-purple-700 px-4 py-2 rounded-lg text-xs font-bold transition-colors">
                 📄 อัปโหลดไฟล์ PDF
                 <input type="file" accept="application/pdf, image/*" className="hidden" onChange={(e) => handleFileUpload(e, 'resumeURL')} />
-              </label>
+             </label>
           </div>
         </div>
       </div>

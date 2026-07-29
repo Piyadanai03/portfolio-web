@@ -68,7 +68,7 @@ export const useProfile = () => {
     setProfile(prev => ({ ...prev, [name]: value }));
   };
 
-  const saveProfile = async () => {
+const saveProfile = async () => {
     setIsLoading(true);
     try {
       const formData = new FormData();
@@ -77,6 +77,11 @@ export const useProfile = () => {
       formData.append('bioText', profile.bioText);
       formData.append('address', profile.address);
       formData.append('contacts', JSON.stringify(contacts));
+      
+      // 🌟 เพิ่ม 2 บรรทัดนี้: ส่ง URL ที่พิมพ์ในช่อง Input ไปให้ Backend ด้วย
+      formData.append('profileImageURL', profile.profileImageURL);
+      formData.append('resumeURL', profile.resumeURL);
+
       if (profileFile) {
         formData.append('profileImage', profileFile);
       }
