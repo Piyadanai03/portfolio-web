@@ -10,13 +10,13 @@ interface TechFormProps {
 }
 
 const CATEGORY_OPTIONS = [
-  "Frontend", "Backend", "Database", "DevOps", "AI/ML", "Tools", "Other"
+  "Language","Frontend", "Backend", "Database", "ORM (Object-Relational Mapping)", "DevOps", "AI/ML", "Tools", "Other"
 ];
 
 export const TechForm = ({ initialData, onSave, onCancel, isLoading }: TechFormProps) => {
   const [formData, setFormData] = useState<Partial<Technology>>(() => {
     if (initialData) return { ...initialData };
-    return { name: '', category: 'Frontend', iconURL: '' };
+    return { name: '', category: 'Other', iconURL: '' };
   });
   
   const [iconFile, setIconFile] = useState<File | null>(null);
@@ -95,7 +95,7 @@ export const TechForm = ({ initialData, onSave, onCancel, isLoading }: TechFormP
             <label className="block text-sm font-bold text-slate-700 mb-1">Category (หมวดหมู่) *</label>
             <select 
               name="category" 
-              value={formData.category || 'Frontend'} 
+              value={formData.category || 'Other'} 
               onChange={handleChange} 
               disabled={isLoading}
               className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 bg-slate-50 focus:bg-white transition-all font-medium disabled:opacity-50"
