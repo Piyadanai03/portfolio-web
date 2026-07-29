@@ -29,6 +29,7 @@ export const mockStudies: Study[] = [
     degree: "Bachelor of Science",
     major: "Information Technology",
     institution: "Buriram Rajabhat University",
+    faculty: "Faculty of Science",
     gpa: 3.17,
     graduationDate: "2026-03-31T00:00:00Z"
   }
