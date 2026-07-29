@@ -36,7 +36,8 @@ const AdminTech = () => {
         await addTech(data as Omit<Technology, 'id'>, iconFile);
       }
       handleCloseModal();
-    } catch (err) {
+    } catch (error) {
+      console.error(error);
       // Error handling ทำโดย useTech hook แล้ว
       setIsSubmitting(false);
     }

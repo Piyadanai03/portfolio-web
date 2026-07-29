@@ -22,11 +22,18 @@ export const TechForm = ({ initialData, onSave, onCancel, isLoading }: TechFormP
   const [iconFile, setIconFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>(initialData?.iconURL || '');
 
+  // 🌟 1. อัปเกรด handleChange: วาง URL ปุ๊บ รูปเปลี่ยนปั๊บ
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'iconURL') {
+      setPreview(value);
+      setIconFile(null); // เคลียร์ไฟล์ออกถ้าเลือกใช้ URL
+    }
   };
 
+  // 🌟 2. อัปเกรด handleIconUpload: เลือกไฟล์ปุ๊บ รูปขึ้นปั๊บ
   const handleIconUpload = (file: File | undefined) => {
     if (!file) return;
     if (file.size > 100 * 1024) {
@@ -35,6 +42,8 @@ export const TechForm = ({ initialData, onSave, onCancel, isLoading }: TechFormP
     }
     
     setIconFile(file);
+    setFormData(prev => ({ ...prev, iconURL: '' })); // เคลียร์ช่องข้อความ URL ออก
+
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreview(reader.result as string);
@@ -45,11 +54,9 @@ export const TechForm = ({ initialData, onSave, onCancel, isLoading }: TechFormP
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     
-    // ถ้ามี icon file ใหม่ ส่งไปด้วย
     if (iconFile) {
       onSave(formData, iconFile);
     } else {
-      // ถ้าไม่มี icon file ใหม่ แต่มี URL (เช่นจากการแก้ไข) ให้ส่ง URL เดิม
       onSave(formData);
     }
   };
@@ -101,6 +108,7 @@ export const TechForm = ({ initialData, onSave, onCancel, isLoading }: TechFormP
              <label className="block text-sm font-bold text-slate-700 mb-3">Icon (ไอคอน)</label>
              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                 
+                {/* กล่องแสดงรูป Preview */}
                 <div className="w-14 h-14 rounded-xl border border-slate-200 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                    {preview ? (
                      <img src={preview} alt="Preview" className="w-10 h-10 object-contain" />
