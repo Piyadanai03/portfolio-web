@@ -96,6 +96,7 @@ const saveProfile = async () => {
         }
       });
       alert('อัปเดตโปรไฟล์สำเร็จ!');
+      window.location.reload();
     } catch (error) {
       console.error(error);
       alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
