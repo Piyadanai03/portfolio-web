@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAchievements } from "./hooks/useAchievements";
 import { AchievementForm } from "./components/AchievementForm";
 import type { Achievement } from "../../../types";
+import Loading from "../../../components/Loading";
 
 const AdminAchievements = () => {
   const {
@@ -68,11 +69,7 @@ const AdminAchievements = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="p-8 text-center text-slate-500 font-medium">
-        กำลังโหลดข้อมูล...
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

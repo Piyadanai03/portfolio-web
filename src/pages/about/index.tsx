@@ -3,17 +3,14 @@ import ProfileSection from './components/ProfileSection';
 import ExperienceTimeline from './components/ExperienceTimeline';
 import EducationGrid from './components/EducationGrid';
 import AchievementList from './components/AchievementList';
+import Loading from '../../components/Loading';
 
 const AboutPage = () => {
   // 2. อย่าลืมดึง achievements ออกมาจาก useAbout() ด้วย
   const { user, achievements, loading } = useAbout();
 
   if (loading || !user) {
-    return (
-      <div className="min-h-[60vh] flex justify-center items-center">
-        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

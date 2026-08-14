@@ -1,16 +1,12 @@
 import { useProjects } from './hooks/useProjects';
 import ProjectCard from './components/ProjectCard';
+import Loading from '../../components/Loading';
 
 const ProjectPage = () => {
   const { projects, loading } = useProjects();
 
   if (loading) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center">
-        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-slate-500 font-medium">กำลังโหลดผลงาน...</p>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

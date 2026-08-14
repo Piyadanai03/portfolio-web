@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTech } from './hooks/useTech';
 import { TechForm } from './components/TechForm';
 import type { Technology } from '../../../types';
+import Loading from '../../../components/Loading';
 
 const AdminTech = () => {
   const { techList, isLoading, error, addTech, updateTech, deleteTech } = useTech();
@@ -43,7 +44,7 @@ const AdminTech = () => {
     }
   };
 
-  if (isLoading) return <div className="p-8 text-center text-slate-500 font-medium">กำลังโหลดข้อมูล...</div>;
+  if (isLoading) return <Loading />;
 
   const groupedTech = techList.reduce((acc, tech) => {
     const cat = tech.category || 'Other';
