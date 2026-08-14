@@ -5,11 +5,15 @@ const MainLayout = () => {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <Navbar />
-      <main className="flex-grow">
-        <Outlet /> {/* พื้นที่แสดงเนื้อหาของแต่ละหน้า (Home, Login ฯลฯ) */}
+      <main className="flex-grow pb-20">
+        <Outlet />
       </main>
-      <footer className="py-8 text-center text-slate-400 text-sm border-t border-slate-200 bg-white">
-        © 2026 Piyadanai Krongklang. All rights reserved.
+      <footer className="bg-white border-t border-slate-200 py-6 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-slate-500 text-sm font-medium tracking-wide">
+            © {new Date().getFullYear()} Piyadanai Krongklang. All rights reserved.
+          </p>
+        </div>
       </footer>
     </div>
   );
