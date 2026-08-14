@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useEducation } from './hooks/useEducation';
 import { EducationForm } from './components/EducationForm';
 import type { Study } from '../../../types';
+import Loading from '../../../components/Loading';
 
 const AdminEducation = () => {
   const { educationList, isLoading, error, addEducation, updateEducation, deleteEducation } = useEducation();
@@ -68,11 +69,7 @@ const AdminEducation = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="p-8 text-center text-slate-500 font-medium">
-        กำลังโหลดข้อมูล...
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

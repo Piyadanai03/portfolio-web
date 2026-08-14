@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useProjectList } from './hooks/useProjectList';
 import { ProjectTable } from './components/ProjectTable';
+import Loading from '../../../components/Loading';
 
 const AdminProjectList = () => {
   const { projects, isLoading, deleteProject } = useProjectList();
 
   if (isLoading) {
-    return <div className="p-8 text-center text-slate-500 font-medium">กำลังโหลดข้อมูล...</div>;
+    return <Loading />;
   }
 
   return (
