@@ -1,9 +1,15 @@
-import { useState, useEffect } from 'react';
-import type { ChangeEvent, FormEvent } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { authApi, publicApi } from '../../../../api/axios';
-import type { ProjectImage, Technology, Project , NewGalleryItem , ProjectFormData} from '../../../../types';
-import type { Experience } from '../../../../types/resumeType';
+import { useState, useEffect } from "react";
+import type { ChangeEvent, FormEvent } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { authApi, publicApi } from "../../../../api/axios";
+import type {
+  ProjectImage,
+  Technology,
+  Project,
+  NewGalleryItem,
+  ProjectFormData,
+} from "../../../../types";
+import type { Experience } from "../../../../types/resumeType";
 
 export const useProjectForm = () => {
   const navigate = useNavigate();
@@ -22,30 +28,34 @@ export const useProjectForm = () => {
   const [selectedCover, setSelectedCover] = useState<File | null>(null);
   const [previewCover, setPreviewCover] = useState<string>("");
 
-  const [existingGallery, setExistingGallery] = useState<ProjectImage[]>([]); 
-  const [newGallery, setNewGallery] = useState<NewGalleryItem[]>([]); 
-  const [deletedGalleryIds, setDeletedGalleryIds] = useState<string[]>([]); 
+  const [existingGallery, setExistingGallery] = useState<ProjectImage[]>([]);
+  const [newGallery, setNewGallery] = useState<NewGalleryItem[]>([]);
+  const [deletedGalleryIds, setDeletedGalleryIds] = useState<string[]>([]);
 
-  const [availableTechs, setAvailableTechs] = useState<Technology[]>([]); 
-  const [selectedTechIds, setSelectedTechIds] = useState<string[]>([]); 
+  const [availableTechs, setAvailableTechs] = useState<Technology[]>([]);
+  const [selectedTechIds, setSelectedTechIds] = useState<string[]>([]);
 
-  const [availableExperiences, setAvailableExperiences] = useState<Experience[]>([]);
+  const [availableExperiences, setAvailableExperiences] = useState<
+    Experience[]
+  >([]);
   const [selectedExperienceId, setSelectedExperienceId] = useState<string>("");
 
   useEffect(() => {
     const fetchProjectData = async () => {
       setIsFetching(true);
       try {
-        const techResponse = await authApi.get('/member/tech');
+        const techResponse = await authApi.get("/member/tech");
         setAvailableTechs(techResponse.data);
 
         // Fetch experiences
-        const experienceResponse = await authApi.get('/member/experiences');
+        const experienceResponse = await authApi.get("/member/experiences");
         setAvailableExperiences(experienceResponse.data || []);
 
         if (isEditMode) {
-          const response = await publicApi.get('/projects'); 
-          const existingProject = response.data.find((p: Project) => p.id === id);
+          const response = await publicApi.get("/projects");
+          const existingProject = response.data.find(
+            (p: Project) => p.id === id,
+          );
 
           if (existingProject) {
             setFormData({
@@ -60,7 +70,9 @@ export const useProjectForm = () => {
               setExistingGallery(existingProject.images);
             }
             if (existingProject.technologies) {
-              setSelectedTechIds(existingProject.technologies.map((t: Technology) => t.id));
+              setSelectedTechIds(
+                existingProject.technologies.map((t: Technology) => t.id),
+              );
             }
             if (existingProject.experienceID) {
               setSelectedExperienceId(existingProject.experienceID);
@@ -85,7 +97,9 @@ export const useProjectForm = () => {
     fetchProjectData();
   }, [id, isEditMode]);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -97,7 +111,7 @@ export const useProjectForm = () => {
       setPreviewCover(URL.createObjectURL(file));
     }
   };
-  
+
   const removeCover = () => {
     setSelectedCover(null);
     setPreviewCover("");
@@ -105,37 +119,48 @@ export const useProjectForm = () => {
 
   const handleAddGalleryImages = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    const newItems = files.map(file => ({
-      file, preview: URL.createObjectURL(file), caption: "" 
+    const newItems = files.map((file) => ({
+      file,
+      preview: URL.createObjectURL(file),
+      caption: "",
     }));
-    setNewGallery(prev => [...prev, ...newItems]);
+    setNewGallery((prev) => [...prev, ...newItems]);
   };
 
   const handleGalleryCaptionChange = (index: number, caption: string) => {
-    setNewGallery(prev => prev.map((item, i) => i === index ? { ...item, caption } : item));
+    setNewGallery((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, caption } : item)),
+    );
   };
 
-  const handleExistingGalleryCaptionChange = (imageId: string, newCaption: string) => {
-    setExistingGallery(prev => prev.map(img => img.id === imageId ? { ...img, caption: newCaption } : img));
+  const handleExistingGalleryCaptionChange = (
+    imageId: string,
+    newCaption: string,
+  ) => {
+    setExistingGallery((prev) =>
+      prev.map((img) =>
+        img.id === imageId ? { ...img, caption: newCaption } : img,
+      ),
+    );
   };
 
   const removeNewGalleryImage = (index: number) => {
-    setNewGallery(prev => prev.filter((_, i) => i !== index));
+    setNewGallery((prev) => prev.filter((_, i) => i !== index));
   };
 
   const removeExistingGalleryImage = (imageId: string) => {
-    setExistingGallery(prev => prev.filter(img => img.id !== imageId));
-    setDeletedGalleryIds(prev => [...prev, imageId]); 
+    setExistingGallery((prev) => prev.filter((img) => img.id !== imageId));
+    setDeletedGalleryIds((prev) => [...prev, imageId]);
   };
 
   const addTech = (techId: string) => {
     if (!selectedTechIds.includes(techId)) {
-      setSelectedTechIds(prev => [...prev, techId]);
+      setSelectedTechIds((prev) => [...prev, techId]);
     }
   };
 
   const removeTech = (techId: string) => {
-    setSelectedTechIds(prev => prev.filter(id => id !== techId));
+    setSelectedTechIds((prev) => prev.filter((id) => id !== techId));
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -144,51 +169,49 @@ export const useProjectForm = () => {
 
     try {
       const submitData = new FormData();
+
+      submitData.append("title", formData.title);
+      submitData.append("description", formData.description);
+      submitData.append("githubURL", formData.githubURL);
+      submitData.append("experienceID", selectedExperienceId || "");
+      submitData.append("coverImageURL", previewCover || "");
       
-      submitData.append('title', formData.title);
-      submitData.append('description', formData.description);
-      submitData.append('githubURL', formData.githubURL);
-      
-      if (selectedExperienceId) {
-        submitData.append('experienceID', selectedExperienceId);
-      }
-      
+
       if (selectedCover) {
-        submitData.append('coverImage', selectedCover);
+        submitData.append("coverImage", selectedCover);
       }
 
       newGallery.forEach((item) => {
-        submitData.append('galleryImages', item.file);
-        submitData.append('galleryCaptions', item.caption); 
+        submitData.append("galleryImages", item.file);
+        submitData.append("galleryCaptions", item.caption);
       });
 
       existingGallery.forEach((img) => {
-        submitData.append('existingImageIds', img.id);
-        submitData.append('existingImageCaptions', img.caption || "");
+        submitData.append("existingImageIds", img.id);
+        submitData.append("existingImageCaptions", img.caption || "");
       });
 
-      deletedGalleryIds.forEach(id => {
-        submitData.append('deletedGalleryIds', id);
+      deletedGalleryIds.forEach((id) => {
+        submitData.append("deletedGalleryIds", id);
       });
 
-      selectedTechIds.forEach(id => {
-        submitData.append('techIds', id); 
+      selectedTechIds.forEach((id) => {
+        submitData.append("techIds", id);
       });
 
       if (isEditMode) {
         await authApi.put(`/member/projects/${id}`, submitData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
+          headers: { "Content-Type": "multipart/form-data" },
         });
         alert("อัปเดตข้อมูลสำเร็จ!");
       } else {
         await authApi.post(`/member/projects`, submitData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
+          headers: { "Content-Type": "multipart/form-data" },
         });
         alert("เพิ่มโปรเจกต์ใหม่สำเร็จ!");
       }
 
       navigate("/admin/projects");
-      
     } catch (error) {
       console.error("Submit Error:", error);
       alert("เกิดข้อผิดพลาดในการบันทึก กรุณาลองใหม่อีกครั้ง");
@@ -197,17 +220,29 @@ export const useProjectForm = () => {
     }
   };
 
-  return { 
-    isEditMode, formData, previewCover, isLoading, isFetching, 
-    existingGallery, newGallery, 
-    availableTechs, selectedTechIds,
-    availableExperiences, selectedExperienceId,
-    handleChange, handleCoverChange, removeCover, 
-    handleAddGalleryImages, handleGalleryCaptionChange, 
+  return {
+    isEditMode,
+    formData,
+    previewCover,
+    isLoading,
+    isFetching,
+    existingGallery,
+    newGallery,
+    availableTechs,
+    selectedTechIds,
+    availableExperiences,
+    selectedExperienceId,
+    handleChange,
+    handleCoverChange,
+    removeCover,
+    handleAddGalleryImages,
+    handleGalleryCaptionChange,
     handleExistingGalleryCaptionChange,
-    removeNewGalleryImage, removeExistingGalleryImage, 
-    addTech, removeTech,
+    removeNewGalleryImage,
+    removeExistingGalleryImage,
+    addTech,
+    removeTech,
     handleSubmit,
-    setSelectedExperienceId
+    setSelectedExperienceId,
   };
 };
