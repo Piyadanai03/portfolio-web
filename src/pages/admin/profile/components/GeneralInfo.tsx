@@ -1,23 +1,34 @@
-import type { ChangeEvent } from 'react';
-import { TagInput } from './TagInput';
+import type { ChangeEvent } from "react";
+import { TagInput } from "./TagInput";
 
 interface GeneralInfoProps {
   profile: { fullName: string; bioText: string; address: string };
-  handleChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleChange: (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => void;
   positionTags: string[];
   setPositionTags: (tags: string[]) => void;
 }
 
-export const GeneralInfo = ({ profile, handleChange, positionTags, setPositionTags }: GeneralInfoProps) => {
+export const GeneralInfo = ({
+  profile,
+  handleChange,
+  positionTags,
+  setPositionTags,
+}: GeneralInfoProps) => {
   return (
     <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm animate-fade-in">
       <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
-        <span className="p-2 bg-blue-50 text-blue-600 rounded-lg text-sm">👤</span>
+        <span className="p-2 bg-blue-50 text-blue-600 rounded-lg text-sm">
+          👤
+        </span>
         General Information
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="md:col-span-1">
-          <label className="block text-sm font-bold text-slate-700 mb-2">Full Name</label>
+          <label className="block text-sm font-bold text-slate-700 mb-2">
+            Full Name
+          </label>
           <input
             type="text"
             name="fullName"
@@ -37,7 +48,9 @@ export const GeneralInfo = ({ profile, handleChange, positionTags, setPositionTa
         />
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-bold text-slate-700 mb-2">Bio / About Me</label>
+          <label className="block text-sm font-bold text-slate-700 mb-2">
+            Bio / About Me
+          </label>
           <textarea
             name="bioText"
             value={profile.bioText}
@@ -50,7 +63,9 @@ export const GeneralInfo = ({ profile, handleChange, positionTags, setPositionTa
 
         {/* 🌟 เพิ่มช่อง Address */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-bold text-slate-700 mb-2">Address / Location</label>
+          <label className="block text-sm font-bold text-slate-700 mb-2">
+            Address / Location
+          </label>
           <textarea
             name="address"
             value={profile.address}

@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import type { User, Achievement } from '../../../types';
-import { publicApi } from '../../../api/axios';
+import { useState, useEffect } from "react";
+import type { User, Achievement, ApiResponse } from "../../../types";
+import { publicApi } from "../../../api/axios";
 
 export const useAbout = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -12,15 +12,22 @@ export const useAbout = () => {
     const fetchAboutData = async () => {
       try {
         setLoading(true);
-        const response = await publicApi.get('/about');
-        const { user, achievements } = response.data;
-        
-        setUser(user);
-        setAchievements(achievements || []);
         setError(null);
-      } catch (err) {
-        console.error('Failed to fetch about data:', err);
-        setError('Failed to load about page data');
+        const response =
+          await publicApi.get<
+            ApiResponse<{ user: User; achievements: Achievement[] }>
+          >("/about");
+        const res = response.data;
+
+        if (res.success) {
+          setUser(res.data.user);
+          setAchievements(res.data.achievements);
+        } else {
+          setError(res.message || "error occurred while fetching data");
+        }
+      } catch (err: unknown) {
+        console.error("Error fetching about data:", err);
+        setError("not connected to backend");
       } finally {
         setLoading(false);
       }

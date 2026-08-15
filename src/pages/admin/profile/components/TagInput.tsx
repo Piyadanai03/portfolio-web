@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { KeyboardEvent } from 'react';
+import { useState } from "react";
+import type { KeyboardEvent } from "react";
 
 interface TagInputProps {
   label: string;
@@ -9,14 +9,20 @@ interface TagInputProps {
   description?: string;
 }
 
-export const TagInput = ({ label, tags, onChange, placeholder, description }: TagInputProps) => {
-  const [inputValue, setInputValue] = useState('');
+export const TagInput = ({
+  label,
+  tags,
+  onChange,
+  placeholder,
+  description,
+}: TagInputProps) => {
+  const [inputValue, setInputValue] = useState("");
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if ((e.key === 'Enter' || e.key === ',') && inputValue.trim() !== '') {
+    if ((e.key === "Enter" || e.key === ",") && inputValue.trim() !== "") {
       e.preventDefault();
       onChange([...tags, inputValue.trim()]);
-      setInputValue('');
+      setInputValue("");
     }
   };
 
@@ -26,17 +32,22 @@ export const TagInput = ({ label, tags, onChange, placeholder, description }: Ta
 
   return (
     <div className="md:col-span-1">
-      <label className="block text-sm font-bold text-slate-700 mb-2">{label}</label>
-      
-      <div 
+      <label className="block text-sm font-bold text-slate-700 mb-2">
+        {label}
+      </label>
+
+      <div
         className="w-full min-h-[52px] p-2 rounded-xl border border-slate-300 bg-slate-50 focus-within:ring-2 focus-within:ring-blue-500 focus-within:bg-white transition-all flex flex-wrap gap-2 cursor-text"
         onClick={() => document.getElementById(`tag-input-${label}`)?.focus()}
       >
         {tags.map((tag, index) => (
-          <span key={index} className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 text-blue-700 text-sm font-bold rounded-lg shadow-sm">
+          <span
+            key={index}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-100 text-blue-700 text-sm font-bold rounded-lg shadow-sm"
+          >
             {tag}
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 removeTag(index);
@@ -58,7 +69,9 @@ export const TagInput = ({ label, tags, onChange, placeholder, description }: Ta
           className="flex-1 bg-transparent border-none focus:outline-none min-w-[150px] text-sm px-2 py-1 text-slate-700"
         />
       </div>
-      {description && <p className="text-xs text-slate-400 mt-2 font-medium">{description}</p>}
+      {description && (
+        <p className="text-xs text-slate-400 mt-2 font-medium">{description}</p>
+      )}
     </div>
   );
 };
