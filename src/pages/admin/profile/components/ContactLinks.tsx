@@ -1,4 +1,4 @@
-import { useState } from "react"; // 🌟 เปลี่ยนจาก useEffect เป็น useState
+import { useState } from "react";
 import type { Contact } from "../../../../types";
 
 interface ContactLinksProps {
@@ -19,18 +19,15 @@ const PLATFORM_OPTIONS = [
   },
   { name: "Facebook", defaultIconURL: "" },
   { name: "Instagram", defaultIconURL: "" },
-  { name: "X / Twitter", defaultIconURL: "" },
   { name: "TikTok", defaultIconURL: "" },
   { name: "YouTube", defaultIconURL: "" },
   { name: "Fastwork", defaultIconURL: "" },
   { name: "Line", defaultIconURL: "" },
   { name: "Phone", defaultIconURL: "" },
   { name: "Email", defaultIconURL: "" },
-  { name: "Website", defaultIconURL: "" },
 ];
 
 export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
-  // 🌟 State สำหรับควบคุมการเปิด/ปิด Popup และเก็บข้อมูลชั่วคราว
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [draftContact, setDraftContact] = useState<Contact>({
     id: "",
@@ -39,8 +36,11 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
     iconURL: "",
     isActive: true,
   });
+  // State เก็บพรีวิวรูปกรณีอัปโหลดไฟล์ใน Modal
+  const [draftLocalPreview, setDraftLocalPreview] = useState<string | null>(
+    null,
+  );
 
-  // 🌟 ฟังก์ชันเปิด Popup และเคลียร์ฟอร์มให้ว่าง
   const openAddModal = () => {
     setDraftContact({
       id: crypto.randomUUID(),
@@ -49,20 +49,23 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
       iconURL: "",
       isActive: true,
     });
+    setDraftLocalPreview(null);
     setIsModalOpen(true);
   };
 
-  // 🌟 ฟังก์ชันกดยืนยันเพิ่มข้อมูลจาก Popup
   const confirmAddContact = () => {
     if (!draftContact.platformName || !draftContact.urlValue) {
       alert("กรุณาเลือกแพลตฟอร์มและใส่ URL/ข้อมูลติดต่อให้ครบถ้วน");
       return;
     }
-    setContacts([...contacts, draftContact]);
-    setIsModalOpen(false); // ปิด popup
+    const finalContact = {
+      ...draftContact,
+      iconURL: draftLocalPreview || draftContact.iconURL,
+    };
+    setContacts([...contacts, finalContact]);
+    setIsModalOpen(false);
   };
 
-  // 🌟 จัดการข้อมูลชั่วคราวใน Popup
   const updateDraftContact = (
     field: keyof Contact,
     value: string | boolean,
@@ -76,29 +79,54 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
         } else if (value === "Other") {
           updated.iconURL = "";
         }
+        setDraftLocalPreview(null); // รีเซ็ตไฟล์เมื่อเปลี่ยน platform
       }
       return updated;
     });
   };
 
-  const handleDraftIconUpload = (file: File | undefined) => {
+  // จัดการอัปโหลดไฟล์ใน Popup Modal
+  const handleDraftFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 100 * 1024) {
+
+    if (file.size > 200 * 1024) {
       alert(
-        "⚠️ ไฟล์ Icon มีขนาดใหญ่เกินไป!\n\nกรุณาเลือกไฟล์ขนาดไม่เกิน 100KB",
+        "⚠️ ไฟล์ Icon มีขนาดใหญ่เกินไป!\n\nกรุณาเลือกไฟล์ขนาดไม่เกิน 200KB",
       );
       return;
     }
+
     const reader = new FileReader();
     reader.onloadend = () => {
-      updateDraftContact("iconURL", reader.result as string);
+      setDraftLocalPreview(reader.result as string);
+      setDraftContact((prev) => ({ ...prev, iconURL: "" })); // เคลียร์ URL เดิมเมื่อเลือกไฟล์
     };
     reader.readAsDataURL(file);
   };
 
-  // ==========================================
-  // ฟังก์ชันจัดการลิสต์เดิม (ทำงานตอน Edit Inline)
-  // ==========================================
+  // จัดการอัปโหลดไฟล์ในลิสต์ Inline
+  const handleInlineFileUpload = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 200 * 1024) {
+      alert(
+        "⚠️ ไฟล์ Icon มีขนาดใหญ่เกินไป!\n\nกรุณาเลือกไฟล์ขนาดไม่เกิน 200KB",
+      );
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      updateContact(index, "iconURL", reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const updateContact = (
     index: number,
     field: keyof Contact,
@@ -135,26 +163,13 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
     }
   };
 
-  const handleIconUpload = (index: number, file: File | undefined) => {
-    if (!file) return;
-    if (file.size > 100 * 1024) {
-      alert(
-        "⚠️ ไฟล์ Icon มีขนาดใหญ่เกินไป!\n\nกรุณาเลือกไฟล์ขนาดไม่เกิน 100KB",
-      );
-      return;
-    }
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      updateContact(index, "iconURL", reader.result as string);
-    };
-    reader.readAsDataURL(file);
-  };
-
   const removeContact = (index: number) => {
     if (window.confirm("คุณต้องการลบช่องทางการติดต่อนี้ใช่หรือไม่?")) {
       setContacts(contacts.filter((_, i) => i !== index));
     }
   };
+
+  const draftDisplayIcon = draftLocalPreview || draftContact.iconURL;
 
   return (
     <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm animate-fade-in relative">
@@ -170,7 +185,6 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
             จัดการช่องทางการติดต่อ เบอร์โทร อีเมล และโซเชียลมีเดีย
           </p>
         </div>
-        {/* 🌟 เปลี่ยนปุ่มให้เรียกฟังก์ชันเปิด Modal แทน */}
         <button
           type="button"
           onClick={openAddModal}
@@ -198,12 +212,18 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
               (p) => p.name === contact.platformName,
             );
             const isCustom = contact.platformName !== "" && !isStandardPlatform;
+            const isBase64 = contact.iconURL?.startsWith("data:");
 
             return (
               <div
                 key={contact.id || index}
-                className={`flex flex-col gap-4 p-5 rounded-2xl border transition-all ${contact.isActive ? "bg-slate-50 border-slate-200 hover:border-emerald-300" : "bg-slate-100/50 border-slate-200 opacity-60"}`}
+                className={`flex flex-col gap-4 p-5 rounded-2xl border transition-all ${
+                  contact.isActive
+                    ? "bg-slate-50 border-slate-200 hover:border-emerald-300"
+                    : "bg-slate-100/50 border-slate-200 opacity-60"
+                }`}
               >
+                {/* แถวที่ 1: Toggle Active, Platform Select และ Contact Value */}
                 <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
                   <label
                     className="flex items-center cursor-pointer shrink-0"
@@ -219,10 +239,14 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
                         }
                       />
                       <div
-                        className={`block w-10 h-6 rounded-full transition-colors ${contact.isActive ? "bg-emerald-500" : "bg-slate-300"}`}
+                        className={`block w-10 h-6 rounded-full transition-colors ${
+                          contact.isActive ? "bg-emerald-500" : "bg-slate-300"
+                        }`}
                       ></div>
                       <div
-                        className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${contact.isActive ? "transform translate-x-4" : ""}`}
+                        className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${
+                          contact.isActive ? "transform translate-x-4" : ""
+                        }`}
                       ></div>
                     </div>
                   </label>
@@ -243,7 +267,7 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
                           updateContact(index, "platformName", e.target.value);
                         }
                       }}
-                      className="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 bg-white font-bold text-slate-700"
+                      className="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 bg-white font-bold text-slate-700 text-sm"
                     >
                       <option value="" disabled>
                         -- เลือกแพลตฟอร์ม --
@@ -282,7 +306,7 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
                         updateContact(index, "urlValue", e.target.value)
                       }
                       placeholder="https://... หรือ เบอร์โทร / อีเมล"
-                      className="flex-1 w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 bg-white"
+                      className="flex-1 w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 bg-white text-sm"
                     />
 
                     <div className="flex gap-1 shrink-0 w-full sm:w-auto justify-end mt-2 sm:mt-0">
@@ -355,16 +379,17 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center pl-0 sm:pl-[3.25rem]">
-                  <div className="w-10 h-10 rounded-lg border border-slate-200 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                {/* แถวที่ 2: การจัดการ Icon แบบเดียวกับ Profile Media */}
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center pl-0 sm:pl-[3.25rem]">
+                  <div className="w-12 h-12 rounded-xl border border-slate-200 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                     {contact.iconURL ? (
                       <img
                         src={contact.iconURL}
                         alt={contact.platformName}
-                        className="w-full h-full object-contain p-1"
+                        className="w-full h-full object-contain p-2"
                       />
                     ) : (
-                      <span className="text-[10px] font-black text-slate-400 uppercase text-center leading-tight tracking-tighter break-all px-1">
+                      <span className="text-[10px] font-black text-slate-400 uppercase text-center leading-tight">
                         {contact.platformName
                           ? contact.platformName.substring(0, 4)
                           : "ICON"}
@@ -372,31 +397,47 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
                     )}
                   </div>
 
-                  <div className="w-full sm:flex-1 relative">
+                  <div className="flex-1 w-full flex flex-col sm:flex-row gap-2 items-center">
                     <input
                       type="url"
-                      value={contact.iconURL}
+                      value={isBase64 ? "" : contact.iconURL}
+                      disabled={isBase64}
                       onChange={(e) =>
                         updateContact(index, "iconURL", e.target.value)
                       }
-                      placeholder="วางลิงก์รูปภาพ Icon..."
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 bg-white"
-                    />
-                  </div>
-                  <span className="text-xs text-slate-400 font-bold hidden sm:block">
-                    หรือ
-                  </span>
-                  <label className="cursor-pointer bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-bold transition-colors w-full sm:w-auto text-center shrink-0">
-                    📁 เลือกไฟล์จากเครื่อง
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) =>
-                        handleIconUpload(index, e.target.files?.[0])
+                      placeholder={
+                        isBase64
+                          ? "✅ ใช้ไฟล์รูปภาพที่อัปโหลดจากเครื่อง"
+                          : "https://... (วางลิงก์รูปภาพ Icon)"
                       }
+                      className="flex-1 w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 bg-white disabled:bg-slate-100 disabled:text-emerald-700 disabled:font-medium"
                     />
-                  </label>
+
+                    {isBase64 ? (
+                      <button
+                        type="button"
+                        onClick={() => updateContact(index, "iconURL", "")}
+                        className="text-xs text-red-500 hover:text-red-700 font-bold px-3 py-2 bg-red-50 hover:bg-red-100 rounded-lg transition-colors shrink-0"
+                      >
+                        ✕ ลบไฟล์
+                      </button>
+                    ) : (
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-xs text-slate-400 font-bold">
+                          หรือ
+                        </span>
+                        <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2 rounded-lg text-xs font-bold transition-colors">
+                          📁 เลือกไฟล์ภาพ
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => handleInlineFileUpload(index, e)}
+                          />
+                        </label>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -404,13 +445,10 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
         </div>
       )}
 
-      {/* ========================================== */}
-      {/* 🌟 Popup Modal สำหรับเพิ่ม Contact ใหม่ */}
-      {/* ========================================== */}
+      {/* Popup Modal สำหรับ Add Contact */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-fade-in">
           <div className="bg-white rounded-3xl shadow-xl w-full max-w-xl overflow-hidden border border-slate-200">
-            {/* Modal Header */}
             <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
               <h3 className="font-bold text-lg text-slate-800 flex items-center gap-2">
                 <span className="text-emerald-500">➕</span>{" "}
@@ -425,7 +463,6 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
               </button>
             </div>
 
-            {/* Modal Body */}
             <div className="p-6 space-y-5">
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">
@@ -493,15 +530,16 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
                 />
               </div>
 
+              {/* ส่วนจัดการ Icon ใน Modal */}
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">
                   ไอคอน (Icon)
                 </label>
                 <div className="flex gap-4 items-center">
                   <div className="w-14 h-14 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 shadow-inner">
-                    {draftContact.iconURL ? (
+                    {draftDisplayIcon ? (
                       <img
-                        src={draftContact.iconURL}
+                        src={draftDisplayIcon}
                         alt="Icon preview"
                         className="w-full h-full object-contain p-2"
                       />
@@ -515,34 +553,42 @@ export const ContactLinks = ({ contacts, setContacts }: ContactLinksProps) => {
                     <input
                       type="url"
                       value={draftContact.iconURL}
-                      onChange={(e) =>
-                        updateDraftContact("iconURL", e.target.value)
-                      }
-                      placeholder="วางลิงก์รูปภาพ Icon..."
-                      className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 bg-white"
+                      disabled={!!draftLocalPreview}
+                      onChange={(e) => {
+                        updateDraftContact("iconURL", e.target.value);
+                        setDraftLocalPreview(null);
+                      }}
+                      placeholder="https://... (วางลิงก์รูปภาพ)"
+                      className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 bg-white disabled:opacity-50"
                     />
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-slate-400 font-bold">
                         หรือ
                       </span>
-                      <label className="cursor-pointer bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-md text-xs font-bold transition-colors">
-                        📁 อัปโหลดไฟล์รูปภาพ (ไม่เกิน 100KB)
+                      <label className="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-md text-xs font-bold transition-colors">
+                        📁 เลือกไฟล์ภาพ
                         <input
                           type="file"
                           accept="image/*"
                           className="hidden"
-                          onChange={(e) =>
-                            handleDraftIconUpload(e.target.files?.[0])
-                          }
+                          onChange={handleDraftFileUpload}
                         />
                       </label>
+                      {draftLocalPreview && (
+                        <button
+                          type="button"
+                          onClick={() => setDraftLocalPreview(null)}
+                          className="text-xs text-red-500 hover:text-red-700 font-bold ml-2"
+                        >
+                          ✕ ยกเลิกไฟล์
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Modal Footer */}
             <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
               <button
                 type="button"

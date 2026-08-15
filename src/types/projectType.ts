@@ -1,5 +1,6 @@
 import type { Technology } from './techType';
 import type { Experience } from './resumeType';
+import type { Achievement } from './achievementType';
 
 export interface ProjectImage {
   id: string;
@@ -21,6 +22,7 @@ export interface Project {
   images?: ProjectImage[];
   technologies?: Technology[];
   experience?: Experience; // ข้อมูลประสบการณ์ที่เชื่อมโยง
+  achievements?: Achievement[];
 }
 
 export interface NewGalleryItem {
