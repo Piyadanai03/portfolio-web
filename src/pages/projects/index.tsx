@@ -14,7 +14,7 @@ const ProjectPage = () => {
       <header className="mb-12 text-center">
         <h1 className="text-4xl font-black text-slate-900 mb-4">All Projects</h1>
         <p className="text-slate-500 max-w-2xl mx-auto">
-          รวบรวมผลงานการพัฒนาซอฟต์แวร์ ตั้งแต่ระบบ Backend หลังบ้าน ไปจนถึงงานวิจัยและ AI
+          Showcasing software development work, from backend systems and infrastructure to research and AI projects
         </p>
       </header>
 
@@ -27,7 +27,7 @@ const ProjectPage = () => {
 
       {projects.length === 0 && (
         <div className="text-center py-20 text-slate-400 italic">
-          ยังไม่มีข้อมูลโปรเจกต์ในขณะนี้
+          No projects found.
         </div>
       )}
     </div>

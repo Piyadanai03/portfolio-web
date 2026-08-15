@@ -1,16 +1,13 @@
 import { useParams, Link } from "react-router-dom";
 import { useProjectDetail } from "./hooks/useProjectDetail";
+import Loading from "../../components/Loading";
 
 const ProjectDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const { project, loading } = useProjectDetail(id);
 
   if (loading) {
-    return (
-      <div className="min-h-[60vh] flex justify-center items-center">
-        <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!project) {
@@ -61,9 +58,9 @@ const ProjectDetailPage = () => {
 
       {/* หัวข้อและ Tech Stack */}
       <div className="mb-10">
-        {/* {relatedAchievements.length > 0 && (
+        {project.achievements && project.achievements.length > 0 && (
           <div className="mb-6 space-y-3">
-            {relatedAchievements.map(ach => (
+            {project.achievements.map(ach => (
               <div key={ach.id} className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
                 <span className="text-2xl animate-bounce">🏆</span>
                 <div>
@@ -75,7 +72,7 @@ const ProjectDetailPage = () => {
               </div>
             ))}
           </div>
-        )} */}
+        )}
         <h1 className="text-4xl font-black text-slate-900 mb-4">
           {project.title}
         </h1>
