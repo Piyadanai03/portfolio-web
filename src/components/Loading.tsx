@@ -11,7 +11,7 @@ const Loading = ({ fullScreen = true }: Props) => {
         <span>Dev</span>
       </div>
       <div className="w-80 h-3 bg-gray-200 rounded-full overflow-hidden">
-        <div className="h-full w-1/3 bg-blue-600 rounded-full animate-[loading_1.2s_ease-in-out_infinite]"></div>
+        <div className="h-full w-1/3 bg-blue-600 rounded-full animate-[loading_1.8s_ease-in-out_infinite]"></div>
       </div>
       <style>{`
         @keyframes loading {

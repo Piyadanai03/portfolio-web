@@ -6,7 +6,6 @@ import AchievementList from './components/AchievementList';
 import Loading from '../../components/Loading';
 
 const AboutPage = () => {
-  // 2. อย่าลืมดึง achievements ออกมาจาก useAbout() ด้วย
   const { user, achievements, loading } = useAbout();
 
   if (loading || !user) {
@@ -14,7 +13,7 @@ const AboutPage = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-16">
+    <div className="max-w-4xl mx-auto px-4 pt-16 pb-8">
       <ProfileSection user={user} />
       <ExperienceTimeline experiences={user.experiences || []} />
       <EducationGrid studies={user.studies || []} />
