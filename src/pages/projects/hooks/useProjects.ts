@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import type { Project, ApiResponse } from '../../../types';
-import { publicApi } from '../../../api/axios';
+import { useState, useEffect } from "react";
+import type { Project, ApiResponse } from "../../../types";
+import { publicApi } from "../../../api/axios";
 
-export const useProjects = () => {
+export const useProjects = (experienceId?: string | null) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -11,18 +11,23 @@ export const useProjects = () => {
       try {
         setLoading(true);
 
-        const response = await publicApi.get<ApiResponse<Project[]>>('/projects');
+        const response = await publicApi.get<ApiResponse<Project[]>>(
+          "/projects",
+          {
+            params: {
+              experience_id: experienceId || undefined,
+            },
+          },
+        );
         const res = response.data;
 
-        // เช็ค success และ fallback เป็น array เปล่าถ้าไม่มีข้อมูล
         if (res && res.success && Array.isArray(res.data)) {
           setProjects(res.data);
         } else {
           setProjects([]);
         }
-
       } catch (error) {
-        console.error('Fetch projects error:', error);
+        console.error("Fetch projects error:", error);
         setProjects([]);
       } finally {
         setLoading(false);
@@ -30,7 +35,7 @@ export const useProjects = () => {
     };
 
     fetchProjects();
-  }, []);
+  }, [experienceId]);
 
   return { projects, loading };
 };
